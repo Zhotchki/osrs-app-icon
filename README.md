@@ -1,0 +1,1 @@
+# osrs-app-icon
