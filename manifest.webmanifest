@@ -1,21 +1,21 @@
 {
   "name": "OSRS Companion",
   "short_name": "OSRS",
-  "id": "./?v=4",
-  "start_url": "./?v=4",
+  "id": "./?v=5",
+  "start_url": "./?v=5",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0f130e",
   "theme_color": "#10140f",
   "icons": [
     {
-      "src": "./apple-touch-icon.png?v=4",
+      "src": "./apple-touch-icon.png?v=5",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./apple-touch-icon.png?v=4",
+      "src": "./apple-touch-icon.png?v=5",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "maskable"
