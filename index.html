@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=4">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=4">
+<link rel="manifest" href="./manifest.webmanifest?v=5">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=5">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v4</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v5</span></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
 <button data-tab="training">Training</button>
@@ -44,7 +44,7 @@ small{color:var(--muted)}
 <div id="errorBox"></div>
 </main>
 <script>
-const API="https://script.google.com/macros/s/AKfycbyU6Gb-uE-dpVIPwYMKhlp6KITzz3mx_HRfQvdt1rlo1JAAO-y4b_UOv01B48bCjy5O/exec?action=mobileData";
+const API="https://script.google.com/macros/s/AKfycbyqhgxawvjA4bu5jk8fPojBIXie5oeO9NAl76dVmVkpGNscozI7eYadnSQVw5JCOkhjbw/exec?action=mobileData";
 let appData=null;
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
@@ -90,7 +90,7 @@ function renderQuests(){
   const f=q.filter(x=>String(x.name||'').toLowerCase().includes(term));
   document.getElementById('questList').innerHTML=f.length?f.map(x=>'<div class="card"><div class="row"><span>'+esc(x.name)+'</span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div></div>').join(''):'<div class="empty">No matching quests.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=4');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=5');
 loadData(false);
 </script>
 </body></html>
