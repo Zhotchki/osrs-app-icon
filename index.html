@@ -1,37 +1,96 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#10140f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-  <link rel="manifest" href="./manifest.webmanifest?v=3">
-  <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=3">
-  <title>OSRS Companion</title>
-  <style>
-    :root{--bg:#10140f;--card:#1c2419;--gold:#d6b04c;--text:#f4f0df;--muted:#aeb7a6;--line:#34402f}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-    header{padding:16px;border-bottom:1px solid var(--line);background:#151b13}.title{font-size:21px;font-weight:800;color:var(--gold)}
-    main{max-width:760px;margin:auto;padding:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
-    .muted{color:var(--muted);font-size:13px}.status{font-weight:700}.ok{color:#76c77e}.warn{color:#e5c766}
-    button{width:100%;border:0;border-radius:12px;padding:13px;background:var(--gold);font-weight:800;color:#17140b}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10140f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="OSRS Companion">
+<link rel="manifest" href="./manifest.webmanifest?v=4">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=4">
+<title>OSRS Companion</title>
+<style>
+:root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:4;background:rgba(15,19,14,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}
+.wrap{max-width:860px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;color:var(--gold);font-size:22px}.sub{font-size:12px;color:var(--muted)}
+main{padding:14px 16px 90px}.hero,.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+.hero h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#273421;color:var(--gold);font-size:12px;font-weight:700}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.tabs button,.refresh{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:10px;font-weight:800}
+.tabs button.active{background:var(--gold);color:#1a160c}.refresh{width:auto;padding:9px 12px}
+.section{display:none}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
+.skill{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.skill b{display:block;font-size:15px}.lvl{font-size:26px;font-weight:900;color:var(--gold)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}.ok{color:var(--green)}.bad{color:var(--red)}
+.error{border-color:#653939;background:#2a1919}.empty{text-align:center;padding:28px;color:var(--muted)}
+input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#11170f;color:var(--text);margin:8px 0 12px}
+small{color:var(--muted)}
+</style>
 </head>
 <body>
-<header><div class="title">OSRS Companion</div><div class="muted">PWA v3</div></header>
-<main>
-  <div class="card">
-    <div class="status ok">Custom PWA shell installed</div>
-    <p class="muted">This page is now owned by GitHub Pages so iPhone can use the custom icon, manifest and standalone mode reliably.</p>
-  </div>
-  <div class="card">
-    <div class="status warn">Live data connection pending</div>
-    <p class="muted">The existing Apps Script deployment must expose a read-only JSON endpoint before this public frontend can render your spreadsheet data without an iframe.</p>
-  </div>
+<header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
+<main class="wrap">
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v4</span></div></div>
+<div class="tabs">
+<button class="active" data-tab="skills">Skills</button>
+<button data-tab="training">Training</button>
+<button data-tab="quests">Quests</button>
+<button data-tab="diaries">Diaries</button>
+</div>
+<section id="skills" class="section active"><div id="skillsGrid" class="grid"></div></section>
+<section id="training" class="section"><div id="trainingList"></div></section>
+<section id="quests" class="section"><input id="questSearch" placeholder="Search quests…"><div id="questList"></div></section>
+<section id="diaries" class="section"><div id="diaryList"></div></section>
+<div id="errorBox"></div>
 </main>
 <script>
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=3');
+const API="https://script.google.com/macros/s/AKfycbyU6Gb-uE-dpVIPwYMKhlp6KITzz3mx_HRfQvdt1rlo1JAAO-y4b_UOv01B48bCjy5O/exec?action=mobileData";
+let appData=null;
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active');
+}));
+document.getElementById('questSearch').addEventListener('input',renderQuests);
+
+function fmt(n){return Number(n||0).toLocaleString()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function statusClass(s){s=String(s||'').toLowerCase();return /complete|yes|success|profit|unlocked/.test(s)?'ok':(/incomplete|no|locked|error|missing/.test(s)?'bad':'')}
+
+async function loadData(manual=false){
+  const st=document.getElementById('statusText'); const box=document.getElementById('errorBox');
+  st.textContent=manual?'Refreshing…':'Connecting…'; box.innerHTML='';
+  try{
+    const r=await fetch(API+(API.includes('?')?'&':'?')+'_='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    if(!j.ok) throw new Error('Backend returned an error');
+    appData=j.data||{};
+    render();
+    st.textContent='Connected • '+(appData.refreshStatus||'Live data loaded');
+  }catch(e){
+    st.textContent='Connection failed';
+    box.innerHTML='<div class="card error"><b>Live data could not load.</b><div class="muted">'+esc(e.message)+'</div><div class="muted" style="margin-top:8px">Confirm the Apps Script deployment is set to Anyone, then redeploy the existing version.</div></div>';
+  }
+}
+
+function render(){
+  document.getElementById('playerName').textContent=appData.player||'OSRS Player';
+  document.getElementById('lastRefresh').textContent=appData.lastRefresh||'—';
+  const stats=appData.stats||[];
+  document.getElementById('skillsGrid').innerHTML=stats.length?stats.map(s=>'<div class="skill"><b>'+esc(s.skill)+'</b><div class="lvl">'+fmt(s.level)+'</div><small>XP '+fmt(s.xp)+'</small></div>').join(''):'<div class="empty">No skill data.</div>';
+  const fastest=appData.fastest||[];
+  document.getElementById('trainingList').innerHTML=fastest.length?fastest.map(x=>'<div class="card"><div class="row"><b>'+esc(x.skill)+'</b><span>Lvl '+fmt(x.level)+'</span></div><div class="row"><span>'+esc(x.method||'No method')+'</span><span>'+fmt(x.xpHr)+' XP/hr</span></div>'+(x.nextMethod?'<div class="muted" style="margin-top:8px">Next: '+esc(x.nextMethod)+' at '+fmt(x.nextLevel)+'</div>':'')+'</div>').join(''):'<div class="empty">No training data.</div>';
+  renderQuests();
+  const diaries=appData.diaries||[];
+  document.getElementById('diaryList').innerHTML=diaries.length?diaries.map(d=>'<div class="card"><div class="row"><span><b>'+esc(d.region)+'</b><br><small>'+esc(d.tier)+'</small></span><b class="'+statusClass(d.status)+'">'+esc(d.status||'Unknown')+'</b></div></div>').join(''):'<div class="empty">No diary data.</div>';
+}
+function renderQuests(){
+  const q=(appData&&appData.quests)||[]; const term=document.getElementById('questSearch').value.toLowerCase();
+  const f=q.filter(x=>String(x.name||'').toLowerCase().includes(term));
+  document.getElementById('questList').innerHTML=f.length?f.map(x=>'<div class="card"><div class="row"><span>'+esc(x.name)+'</span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div></div>').join(''):'<div class="empty">No matching quests.</div>';
+}
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=4');
+loadData(false);
 </script>
 </body></html>
