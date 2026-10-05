@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=11">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=11">
+<link rel="manifest" href="./manifest.webmanifest?v=12">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=12">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v11</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v12</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -39,6 +39,7 @@ small{color:var(--muted)}
 <button data-tab="diaries">Diaries</button>
 <button data-tab="alchemy">Alchemy</button>
 <button data-tab="optimizer">Optimizer</button>
+<button data-tab="goals">Goals</button>
 </div>
 <section id="skills" class="section active"><div class="toolbar"><input id="skillSearch" placeholder="Search skills…"><select id="skillSort"><option value="default">Default order</option><option value="levelDesc">Highest level</option><option value="levelAsc">Lowest level</option></select></div><div id="skillsGrid" class="grid"></div></section>
 <section id="training" class="section"><div id="trainingList"></div></section>
@@ -46,6 +47,7 @@ small{color:var(--muted)}
 <section id="diaries" class="section"><div class="toolbar"><select id="diaryFilter"><option value="all">All diaries</option><option value="ready">Ready</option><option value="missing">Missing requirements</option><option value="incomplete">Incomplete</option></select></div><div id="diaryList"></div></section>
 <section id="alchemy" class="section"><div class="toolbar"><input id="alchSearch" placeholder="Search items…"><select id="alchSort"><option value="profit">Highest profit</option><option value="name">Item name</option></select></div><div id="alchemyList"></div></section>
 <section id="optimizer" class="section"><div class="card"><b>Training Optimizer</b><div class="muted" style="margin-top:4px">Compare training methods using your current stats and live sheet data.</div><div class="toolbar"><select id="optSkill"></select><select id="optObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Shortest Time</option></select></div><div class="toolbar"><input id="optTarget" type="number" min="2" max="99" value="99" placeholder="Target level"><select id="optLocked"><option value="false">Unlocked only</option><option value="true">Include locked</option></select></div><button class="refresh" id="runOptimizer">Run Optimizer</button></div><div id="optimizerStatus" class="muted"></div><div id="optimizerList"></div></section>
+<section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
 <div id="errorBox"></div>
 </main>
 <script>
@@ -62,6 +64,8 @@ document.getElementById('diaryFilter').addEventListener('change',renderDiaries);
 document.getElementById('alchSearch').addEventListener('input',renderAlchemy);
 document.getElementById('alchSort').addEventListener('change',renderAlchemy);
 document.getElementById('runOptimizer').addEventListener('click',runOptimizer);
+document.getElementById('goalSkill').addEventListener('change',renderGoal);
+document.getElementById('goalTarget').addEventListener('input',renderGoal);
 document.getElementById('skillSearch').addEventListener('input',renderSkills);
 document.getElementById('skillSort').addEventListener('change',renderSkills);
 
@@ -101,6 +105,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
+  populateGoalSkills(); renderGoal();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -139,6 +144,25 @@ function renderDiaries(){
   d=d.filter(x=>matchProgressFilter(x,filter));
   document.getElementById('diaryList').innerHTML=d.length?d.map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.region)+'</b><br><small>'+esc(x.tier)+'</small></span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div><div class="badges"><span class="badge '+statusClass(x.readiness)+'">'+esc(x.readiness||'Readiness unknown')+'</span></div>'+detailBlock(x)+'</div>').join(''):'<div class="empty">No matching diaries.</div>';
 }
+function xpForLevel(level){
+  level=Math.max(1,Math.min(99,Number(level)||1)); let points=0;
+  for(let l=1;l<level;l++) points+=Math.floor(l+300*Math.pow(2,l/7));
+  return Math.floor(points/4);
+}
+function populateGoalSkills(){
+  const el=document.getElementById('goalSkill'); if(!el||el.options.length)return;
+  const names=((appData&&appData.stats)||[]).map(x=>x.skill).filter(x=>x&&String(x).toLowerCase()!=='overall');
+  el.innerHTML=names.map(x=>'<option>'+esc(x)+'</option>').join('');
+}
+function renderGoal(){
+  if(!appData)return;
+  const skill=document.getElementById('goalSkill').value, target=Math.max(2,Math.min(99,Number(document.getElementById('goalTarget').value)||99));
+  const stat=(appData.stats||[]).find(x=>x.skill===skill); if(!stat){document.getElementById('goalResult').innerHTML='';return}
+  const curXp=Number(stat.xp||0), targetXp=xpForLevel(target), remain=Math.max(0,targetXp-curXp);
+  const method=(appData.fastest||[]).find(x=>x.skill===skill), rate=method?Number(method.xpHr||0):0, hours=rate?remain/rate:0;
+  const pct=targetXp?Math.max(0,Math.min(100,curXp/targetXp*100)):100;
+  document.getElementById('goalResult').innerHTML='<div class="card"><div class="row"><span><b>'+esc(skill)+' '+fmt(stat.level)+' → '+target+'</b><br><small>'+fmt(remain)+' XP remaining</small></span><b>'+pct.toFixed(1)+'%</b></div><div class="progress"><i style="width:'+pct+'%"></i></div>'+(method?'<div class="row"><span><b>'+esc(method.method||'Fastest method')+'</b><br><small>'+fmt(rate)+' XP/hr</small></span><b>'+(hours?hours.toFixed(1)+' hr':'—')+'</b></div>':'<div class="muted" style="margin-top:10px">No training estimate is currently available for this skill.</div>')+'</div>';
+}
 function populateOptimizerSkills(){
   const el=document.getElementById('optSkill'); if(!el||el.options.length)return;
   const names=((appData&&appData.stats)||[]).map(x=>x.skill).filter(Boolean);
@@ -166,7 +190,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=11');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=12');
 loadData(false);
 </script>
 </body></html>
