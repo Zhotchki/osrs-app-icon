@@ -490,11 +490,27 @@ function getMobileAppData() {
     region:r[0], tier:r[1], status:r[2], readiness:r[3], missing:r[4], notes:r[5], wiki:r[6]
   }));
 
+  const alchSheet = ss.getSheetByName('High_Alchemy');
+  let highAlchemy = [];
+  if (alchSheet && alchSheet.getLastRow() >= 2) {
+    const vals = alchSheet.getDataRange().getDisplayValues();
+    const headers = vals[0].map(x=>String(x||'').trim());
+    const col = name => headers.indexOf(name);
+    const cItem=col('Item'), cBuy=col('Cost Used'), cAlch=col('High Alch Value'),
+      cNature=col('Nature Rune'), cProfit=col('Profit / Alch'), cLimit=col('GE Limit'),
+      cAge=col('Latest Buy Age (min)');
+    highAlchemy = vals.slice(1).filter(r=>cItem>=0 && r[cItem]).slice(0,300).map(r=>({
+      item:r[cItem], buy:cBuy>=0?r[cBuy]:'', highAlch:cAlch>=0?r[cAlch]:'',
+      nature:cNature>=0?r[cNature]:'', profit:cProfit>=0?r[cProfit]:'',
+      limit:cLimit>=0?r[cLimit]:'', age:cAge>=0?r[cAge]:''
+    }));
+  }
+
   return {
     player,
     lastRefresh: settings ? settings.getRange('G14').getDisplayValue() : '',
     refreshStatus: sanitizeMobileRefreshStatus_(settings ? settings.getRange('G15').getDisplayValue() : ''),
-    stats, fastest, quests, diaries
+    stats, fastest, quests, diaries, highAlchemy
   };
 }
 
