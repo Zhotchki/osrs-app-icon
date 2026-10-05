@@ -435,7 +435,10 @@ function doGet(e) {
 
   // Public, read-only API used by the GitHub Pages PWA.
   if (action === 'mobileData') {
-    return jsonOutput_(getMobileAppData());
+    return jsonOutput_(getMobileCoreData_());
+  }
+  if (action === 'questDiaryData') {
+    return jsonOutput_(getMobileQuestDiaryData_());
   }
 
   if (action === 'optimizer') {
@@ -463,6 +466,20 @@ function jsonOutput_(payload) {
       data: payload
     }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getMobileCoreData_() {
+  const ss=SpreadsheetApp.getActiveSpreadsheet(), settings=ss.getSheetByName('Settings');
+  const stats=(()=>{try{const sh=ss.getSheetByName('Character_Stats');return sh?sh.getRange(11,1,25,4).getDisplayValues().filter(r=>r[0]&&r[0]!=='Overall').map(r=>({skill:r[0],rank:r[1],level:r[2],xp:r[3]})):[]}catch(e){return []}})();
+  const fastest=(()=>{try{const sh=ss.getSheetByName('Fastest_Leveling');return sh?sh.getRange(10,1,24,12).getDisplayValues().filter(r=>r[0]).map(r=>({skill:r[0],level:r[1],method:r[2],req:r[3],xpHr:r[4],gpHr:r[5],gpXp:r[6],status:r[7],nextMethod:r[8],nextLevel:r[9],nextXpHr:r[10],source:r[11]})):[]}catch(e){return []}})();
+  return {player:settings?String(settings.getRange('E4').getDisplayValue()).trim():'',lastRefresh:settings?settings.getRange('G14').getDisplayValue():'',refreshStatus:sanitizeMobileRefreshStatus_(settings?settings.getRange('G15').getDisplayValue():''),stats,fastest};
+}
+function getMobileQuestDiaryData_() {
+  const ss=SpreadsheetApp.getActiveSpreadsheet();
+  const q=ss.getSheetByName('Quest_Tracker'), d=ss.getSheetByName('Diary_Tracker');
+  const quests=q&&q.getLastRow()>=11?q.getRange(11,1,Math.min(220,q.getLastRow()-10),8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({name:r[0],status:r[1],readiness:r[2],missing:r[3],notes:r[4],prereqs:r[5],wiki:r[6]})):[];
+  const diaries=d&&d.getLastRow()>=10?d.getRange(10,1,Math.min(48,d.getLastRow()-9),8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({region:r[0],tier:r[1],status:r[2],readiness:r[3],missing:r[4],notes:r[5],wiki:r[6]})):[];
+  return {quests,diaries};
 }
 
 function getMobileAppData() {
