@@ -1,0 +1,29 @@
+name: Deploy OSRS Apps Script
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'apps-script/**'
+      - '.clasp.json'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g @google/clasp
+      - name: Restore clasp credentials
+        run: |
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+      - name: Push Apps Script source
+        run: clasp push --force
+      - name: Update production deployment
+        if: ${{ secrets.APPS_SCRIPT_DEPLOYMENT_ID != '' }}
+        run: clasp deploy --deploymentId "${{ secrets.APPS_SCRIPT_DEPLOYMENT_ID }}" --description "Automated OSRS deploy ${{ github.sha }}"
