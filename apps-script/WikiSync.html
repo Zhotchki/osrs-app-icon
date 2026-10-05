@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:18px;color:#202124}
+    h2{margin:0 0 8px}.muted{color:#5f6368;font-size:13px;line-height:1.45}
+    button{width:100%;padding:12px;border:0;border-radius:8px;background:#17365D;color:#fff;font-weight:700;margin-top:16px;cursor:pointer}
+    #status{margin-top:16px;padding:12px;background:#f1f3f4;border-radius:8px;white-space:pre-wrap;font-size:13px}
+    .ok{background:#e6f4ea!important}.bad{background:#fce8e6!important}
+  </style>
+</head>
+<body>
+  <h2>WikiSync + Quest Requirements Bridge</h2>
+  <div class="muted">
+    This opens the OSRS Wiki tools site in a small popup. The installed bridge helper runs there, retrieves your public WikiSync data, and sends it back to this spreadsheet.
+  </div>
+  <button onclick="startSync()">Sync WikiSync Now</button>
+  <div id="status">Ready. RuneLite WikiSync should be enabled and your character should have been logged in recently.</div>
+<script>
+let pendingId='', popupRef=null, playerName='';
+
+function setStatus(t,cls){
+  const e=document.getElementById('status');
+  e.textContent=t;
+  e.className=cls||'';
+}
+
+window.addEventListener('message', ev => {
+  if (ev.origin !== 'https://tools.runescape.wiki') return;
+  const r = ev.data || {};
+  if (r.type !== 'osrs-wikisync-bridge-response') return;
+  if (!pendingId || r.requestId !== pendingId) return;
+
+  pendingId='';
+  if (popupRef && !popupRef.closed) popupRef.close();
+
+  if (!r.ok) {
+    setStatus('WikiSync bridge failed:\n' + (r.error || 'Unknown error'),'bad');
+    return;
+  }
+
+  setStatus('Found ' + r.profile + '. Saving to workbook…');
+  google.script.run
+    .withSuccessHandler(saved => {
+      setStatus(
+        'Success!\nProfile: ' + saved.profile +
+        '\nQuests: ' + saved.questCount +
+        '\nQuest requirements: ' + saved.requirementCount +
+        '\nDiaries: ' + (saved.diaries ? 'present' : 'not present') +
+        '\n\nYou can close this window.',
+        'ok'
+      );
+    })
+    .withFailureHandler(e => setStatus('Save failed: ' + (e.message || e),'bad'))
+    .saveWikiSyncBrowserPayload(r.player, r.profile, r.data, r.questRequirements || {}, r.diaryData || null, r.diaryPath || '');
+});
+
+function startSync(){
+  setStatus('Reading character name…');
+  google.script.run
+    .withSuccessHandler(player => {
+      playerName = String(player || '').trim();
+      if (!playerName) {
+        setStatus('Enter a character name in Settings first.','bad');
+        return;
+      }
+
+      pendingId='ws-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+      const url='https://tools.runescape.wiki/osrs-dps/#osrs_player=' +
+        encodeURIComponent(playerName) + '&osrs_request=' + encodeURIComponent(pendingId);
+
+      setStatus('Opening OSRS Wiki bridge for "' + playerName + '"…\n\nIf this is not your exact OSRS character name, cancel and correct Settings!E4.');
+      popupRef=window.open(url,'osrsWikiSyncBridge','width=520,height=700');
+
+      if (!popupRef) {
+        pendingId='';
+        setStatus('Popup blocked. Allow popups for this Google Sheet/App Script page, then try again.','bad');
+        return;
+      }
+
+      setTimeout(() => {
+        if (pendingId) {
+          pendingId='';
+          setStatus(
+            'No response from the OSRS Wiki bridge.\n\nConfirm the v10.14.5 bridge userscript is enabled for tools.runescape.wiki and that the popup was allowed.',
+            'bad'
+          );
+        }
+      },20000);
+    })
+    .withFailureHandler(e => setStatus(e.message || String(e),'bad'))
+    .getWikiSyncPlayerName();
+}
+</script>
+</body>
+</html>

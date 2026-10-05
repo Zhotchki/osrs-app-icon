@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10140f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OSRS Companion">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://zhotchki.github.io/osrs-app-icon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="https://zhotchki.github.io/osrs-app-icon/apple-touch-icon.png">
+  <style>
+    :root{--bg:#10140f;--card:#1c2419;--card2:#263123;--gold:#d6b04c;--text:#f4f0df;--muted:#aeb7a6;--green:#63b86b;--red:#d66a62;--line:#34402f}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+    header{position:sticky;top:0;z-index:5;background:#151b13;border-bottom:1px solid var(--line);padding:14px 16px}
+    .title{font-weight:800;color:var(--gold);font-size:20px}.sub{font-size:12px;color:var(--muted);margin-top:2px}
+    main{padding:14px 14px 84px;max-width:760px;margin:auto}.view{display:none}.view.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+    .card h3{margin:0 0 8px;font-size:14px;color:var(--gold)}.big{font-size:25px;font-weight:800}.muted{color:var(--muted);font-size:12px}
+    .row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+    .method{font-weight:700}.pill{font-size:11px;padding:3px 7px;border-radius:999px;background:var(--card2);white-space:nowrap}
+    .profit{color:var(--green)}.cost{color:var(--red)}.locked{color:var(--muted)}
+    nav{position:fixed;bottom:0;left:0;right:0;z-index:10;background:#151b13;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}
+    nav button{background:none;border:0;color:var(--muted);font-size:11px;padding:8px 4px;width:20%}nav button.active{color:var(--gold);font-weight:800}
+    select,input,button.action{width:100%;background:#11170f;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;margin-top:7px}
+    button.action{background:var(--gold);color:#16140b;font-weight:800;border:0}.controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .skillline{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+    .level{font-size:20px;font-weight:800;color:var(--gold)} .sectiontitle{font-size:18px;font-weight:800;margin:4px 0 12px}
+    .spinner{text-align:center;padding:40px;color:var(--muted)}
+    @media(min-width:620px){.grid{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<header><div class="title">OSRS Companion</div><div class="sub" id="headerSub">Loading account…</div></header>
+<main>
+  <section id="home" class="view active"><div class="sectiontitle">Dashboard</div><div class="grid" id="homeCards"></div><div class="card" style="margin-top:10px"><h3>WikiSync</h3><div id="wikiSyncText" class="muted">Not synced in this browser yet.</div><button class="action" onclick="browserWikiSync()">Sync WikiSync</button></div><div class="card" style="margin-top:10px"><h3>Refresh</h3><div id="refreshText" class="muted"></div><button class="action" onclick="refreshAll()">Refresh now</button></div></section>
+  <section id="fastest" class="view"><div class="sectiontitle">Fastest Leveling</div><div class="card" id="fastestList"></div></section>
+  <section id="optimizer" class="view"><div class="sectiontitle">Optimizer</div><div class="card"><div class="controls"><select id="optSkill"></select><select id="optObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Shortest Time</option></select></div><div class="controls"><select id="optLocked"><option value="true">Show locked</option><option value="false">Unlocked only</option></select><input id="optTarget" type="number" min="1" max="99" value="99"></div><button class="action" onclick="runOptimizer()">Optimize</button></div><div class="card" style="margin-top:10px" id="optimizerList"></div></section>
+  <section id="skills" class="view"><div class="sectiontitle">Skills</div><div class="card" id="skillsList"></div></section>
+  <section id="progress" class="view"><div class="sectiontitle">Progress</div><div class="grid" id="progressCards"></div><div class="card" style="margin-top:10px"><h3>Recent Quest States</h3><div id="questList"></div></div></section>
+</main>
+<nav>
+  <button class="active" onclick="showView('home',this)">Home</button>
+  <button onclick="showView('fastest',this)">Fastest</button>
+  <button onclick="showView('optimizer',this)">Optimizer</button>
+  <button onclick="showView('skills',this)">Skills</button>
+  <button onclick="showView('progress',this)">Progress</button>
+</nav>
+<script>
+const skills=['All Skills','Attack','Defence','Strength','Hitpoints','Ranged','Prayer','Magic','Cooking','Woodcutting','Fletching','Fishing','Firemaking','Crafting','Smithing','Mining','Herblore','Agility','Thieving','Slayer','Farming','Runecraft','Hunter','Construction','Sailing'];
+const fmt=n=>Number(n||0).toLocaleString(undefined,{maximumFractionDigits:1});
+let DATA=null;
+function showView(id,btn){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
+function load(){google.script.run.withSuccessHandler(render).getMobileAppData()}
+function render(d){DATA=d;document.getElementById('headerSub').textContent=(d.player||'No character')+' • '+(d.lastRefresh||'Not refreshed');
+ const totalLvl=d.stats.reduce((a,x)=>a+Number(x.level||0),0), qDone=d.quests.filter(x=>x.status==='Complete').length, dDone=d.diaries.filter(x=>x.status==='Complete').length;
+ document.getElementById('homeCards').innerHTML=`<div class="card"><h3>Total Level</h3><div class="big">${fmt(totalLvl)}</div></div><div class="card"><h3>Quests</h3><div class="big">${qDone}</div><div class="muted">complete</div></div><div class="card"><h3>Diary Tiers</h3><div class="big">${dDone}</div><div class="muted">complete</div></div><div class="card"><h3>Tracked Skills</h3><div class="big">${d.fastest.length}</div></div>`;
+ document.getElementById('refreshText').textContent='Last refresh: '+(d.lastRefresh||'never')+' • '+(d.refreshStatus||'');
+ document.getElementById('fastestList').innerHTML=d.fastest.map(x=>`<div class="row"><div><div class="method">${x.skill} ${x.level}</div><div>${x.method}</div><div class="muted">${fmt(x.xpHr)} XP/hr${x.nextMethod?` • Next: ${x.nextMethod} @ ${x.nextLevel}`:''}</div></div><span class="pill ${x.status==='Profit'?'profit':x.status==='Cost'?'cost':''}">${x.status}</span></div>`).join('');
+ document.getElementById('skillsList').innerHTML=d.stats.map(x=>`<div class="skillline"><div><b>${x.skill}</b><div class="muted">${fmt(x.xp)} XP</div></div><div class="level">${x.level}</div></div>`).join('');
+ const qi=d.quests.filter(x=>x.status==='In Progress').length, qu=d.quests.filter(x=>x.status==='Unknown').length;
+ document.getElementById('progressCards').innerHTML=`<div class="card"><h3>Quest Complete</h3><div class="big">${qDone}</div></div><div class="card"><h3>In Progress</h3><div class="big">${qi}</div></div><div class="card"><h3>Diary Complete</h3><div class="big">${dDone}</div></div><div class="card"><h3>Unknown</h3><div class="big">${qu}</div></div>`;
+ document.getElementById('questList').innerHTML=d.quests.slice(0,20).map(x=>`<div class="row"><span>${x.name}</span><span class="pill">${x.status}</span></div>`).join('');
+}
+
+let __wsPending='', __wsPopup=null;
+
+window.addEventListener('message', ev => {
+  if (ev.origin !== 'https://tools.runescape.wiki') return;
+  const r=ev.data||{};
+  if(r.type!=='osrs-wikisync-bridge-response') return;
+  if(!__wsPending || r.requestId!==__wsPending) return;
+
+  const el=document.getElementById('wikiSyncText');
+  __wsPending='';
+  if(__wsPopup && !__wsPopup.closed) __wsPopup.close();
+
+  if(!r.ok){
+    if(el)el.textContent='WikiSync bridge failed: '+(r.error||'unknown error');
+    return;
+  }
+
+  if(el)el.textContent='Saving '+r.profile+' WikiSync data…';
+  google.script.run
+    .withSuccessHandler(saved=>{
+      if(el)el.textContent='Synced '+saved.profile+' • '+saved.questCount+' quests • '+saved.requirementCount+' requirement records'+(saved.diaries?' • diaries loaded':'');
+      load();
+    })
+    .withFailureHandler(err=>{
+      if(el)el.textContent='Save failed: '+(err.message||err);
+    })
+    .saveWikiSyncBrowserPayload(r.player,r.profile,r.data,r.questRequirements || {});
+});
+
+function browserWikiSync(){
+  const el=document.getElementById('wikiSyncText');
+  const player=(DATA&&DATA.player)?DATA.player:'';
+  if(!player){
+    if(el)el.textContent='No character name is set in Settings.';
+    return;
+  }
+
+  __wsPending='ws-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+  const url='https://tools.runescape.wiki/osrs-dps/#osrs_player='+
+    encodeURIComponent(player)+'&osrs_request='+encodeURIComponent(__wsPending);
+
+  if(el)el.textContent='Opening OSRS Wiki bridge…';
+  __wsPopup=window.open(url,'osrsWikiSyncBridge','width=520,height=700');
+
+  if(!__wsPopup){
+    __wsPending='';
+    if(el)el.textContent='Popup blocked. Allow popups for this web app, then try again.';
+    return;
+  }
+
+  setTimeout(()=>{
+    if(__wsPending){
+      __wsPending='';
+      if(el)el.textContent='No bridge response. Confirm the v10.12 userscript is enabled on tools.runescape.wiki.';
+    }
+  },20000);
+}
+
+function refreshAll(){document.getElementById('refreshText').textContent='Refreshing…';google.script.run.withSuccessHandler(render).refreshMobileApp()}
+function runOptimizer(){const skill=document.getElementById('optSkill').value,obj=document.getElementById('optObjective').value,locked=document.getElementById('optLocked').value==='true',target=document.getElementById('optTarget').value;document.getElementById('optimizerList').innerHTML='<div class="spinner">Optimizing…</div>';google.script.run.withSuccessHandler(rows=>{document.getElementById('optimizerList').innerHTML=rows.slice(0,30).map(x=>`<div class="row"><div><div class="method">${x.skill} • ${x.method}</div><div class="muted">Lvl ${x.req} • ${fmt(x.xpHr)} XP/hr • ${fmt(x.gpHr)} GP/hr</div></div><span class="pill ${x.unlocked==='No'?'locked':x.status==='Profit'?'profit':x.status==='Cost'?'cost':''}">${x.unlocked==='No'?'Locked':x.status}</span></div>`).join('')}).getMobileOptimizer(skill,obj,locked,target)}
+document.getElementById('optSkill').innerHTML=skills.map(x=>`<option>${x}</option>`).join('');
+load();
+</script>
+</body>
+</html>
