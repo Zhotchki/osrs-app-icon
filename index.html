@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=33">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=33">
+<link rel="manifest" href="./manifest.webmanifest?v=34">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=34">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v33</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v34</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -501,6 +501,52 @@ const GEAR=[
 ['Magic','Neck','Occult necklace',70,'Magic',5,'High-priority magic damage necklace.'],
 ['Magic','Hands','Tormented bracelet',75,'Hitpoints',5,'High-priority offensive magic glove upgrade.']
 ];
+const GEAR_GET={
+'Dragon scimitar':['Quest / shop','Complete Monkey Madness I, then buy it from Daga on Ape Atoll.','https://oldschool.runescape.wiki/w/Dragon_scimitar'],
+'Abyssal whip':['Drop / GE','Buy it on the Grand Exchange, or obtain it as a 1/512 drop from abyssal demons (85 Slayer).','https://oldschool.runescape.wiki/w/Abyssal_whip'],
+'Abyssal tentacle':['Upgrade','Combine an abyssal whip with a kraken tentacle. Both components are tradeable.','https://oldschool.runescape.wiki/w/Abyssal_tentacle'],
+'Helm of Neitiznot':['Quest / shop','Complete The Fremennik Isles and obtain/buy the helm through the quest progression.','https://oldschool.runescape.wiki/w/Helm_of_neitiznot'],
+'Neitiznot faceguard':['Upgrade','Combine a helm of neitiznot with a basilisk jaw; the jaw can be bought or obtained from basilisk knights.','https://oldschool.runescape.wiki/w/Neitiznot_faceguard'],
+'Fighter torso':['Minigame','Earn the required points in all four roles at Barbarian Assault, then purchase the torso from the rewards shop.','https://oldschool.runescape.wiki/w/Fighter_torso'],
+'Bandos chestplate':['Drop / GE','Buy it on the Grand Exchange or obtain it from General Graardor/bodyguards in the God Wars Dungeon.','https://oldschool.runescape.wiki/w/Bandos_chestplate'],
+'Bandos tassets':['Drop / GE','Buy them on the Grand Exchange or obtain them from General Graardor/bodyguards in the God Wars Dungeon.','https://oldschool.runescape.wiki/w/Bandos_tassets'],
+'Fire cape':['PvM reward','Complete the TzHaar Fight Cave and defeat TzTok-Jad.','https://oldschool.runescape.wiki/w/Fire_cape'],
+'Amulet of glory':['Craft / GE','Buy it on the Grand Exchange, or enchant a dragonstone amulet.','https://oldschool.runescape.wiki/w/Amulet_of_glory'],
+'Amulet of fury':['Craft / GE','Buy it on the Grand Exchange, or enchant an onyx amulet.','https://oldschool.runescape.wiki/w/Amulet_of_fury'],
+'Amulet of torture':['Craft / GE','Buy it on the Grand Exchange, or enchant a zenyte necklace.','https://oldschool.runescape.wiki/w/Amulet_of_torture'],
+'Barrows gloves':['Quest reward','Complete Recipe for Disaster and purchase them from the Culinaromancer’s Chest.','https://oldschool.runescape.wiki/w/Barrows_gloves'],
+'Dragon boots':['Drop / GE','Buy them on the Grand Exchange, or obtain them from spiritual mages (83 Slayer).','https://oldschool.runescape.wiki/w/Dragon_boots'],
+'Magic shortbow (i)':['Upgrade / GE','Use a magic shortbow scroll on a magic shortbow; the components can be traded.','https://oldschool.runescape.wiki/w/Magic_shortbow_(i)'],
+'Rune crossbow':['Craft / drop / GE','Buy it on the Grand Exchange, make one with Fletching/Smithing components, or obtain it from several monsters.','https://oldschool.runescape.wiki/w/Rune_crossbow'],
+'Toxic blowpipe':['Upgrade / GE','Use a chisel on a tanzanite fang; the fang/blowpipe can be traded.','https://oldschool.runescape.wiki/w/Toxic_blowpipe'],
+'Archer helm':['Shop','Purchase it from Skulgrimen after The Fremennik Trials.','https://oldschool.runescape.wiki/w/Archer_helm'],
+'Masori mask':['Raid reward / GE','Buy it on the Grand Exchange or obtain it as a Tombs of Amascut unique reward.','https://oldschool.runescape.wiki/w/Masori_mask'],
+'Black d’hide body':['Craft / GE','Buy it on the Grand Exchange or craft it from black dragon leather.','https://oldschool.runescape.wiki/w/Black_d%27hide_body'],
+'Blessed d’hide body':['Treasure Trails / GE','Buy a god-blessed variant on the Grand Exchange or obtain one from hard Treasure Trails.','https://oldschool.runescape.wiki/w/Blessed_dragonhide_armour'],
+'Masori body':['Raid reward / GE','Buy it on the Grand Exchange or obtain it as a Tombs of Amascut unique reward.','https://oldschool.runescape.wiki/w/Masori_body'],
+'Ava’s accumulator':['Quest / upgrade','Complete Animal Magnetism; with 50 Ranged, obtain the accumulator from Ava using the required arrows/coins or upgrade an attractor.','https://oldschool.runescape.wiki/w/Ava%27s_accumulator'],
+'Ava’s assembler':['Upgrade / boss','Give Ava a Vorkath’s head, 75 mithril arrows, and an Ava’s accumulator (or the coin alternative). Vorkath’s head comes from Vorkath.','https://oldschool.runescape.wiki/w/Ava%27s_assembler'],
+'Necklace of anguish':['Craft / GE','Buy it on the Grand Exchange, or enchant a zenyte necklace.','https://oldschool.runescape.wiki/w/Necklace_of_anguish'],
+'Pegasian boots':['Upgrade / GE','Combine ranger boots with a pegasian crystal; both components can be traded.','https://oldschool.runescape.wiki/w/Pegasian_boots'],
+'Iban’s staff':['Quest reward','Obtain it during Underground Pass; it can later be upgraded/recharged through its quest-related progression.','https://oldschool.runescape.wiki/w/Iban%27s_staff'],
+'Trident of the seas':['Drop / GE','Buy it on the Grand Exchange or obtain an uncharged trident from cave krakens/Kraken while on task.','https://oldschool.runescape.wiki/w/Trident_of_the_seas'],
+'Trident of the swamp':['Upgrade / GE','Use a magic fang on a trident of the seas; the finished weapon/components are tradeable.','https://oldschool.runescape.wiki/w/Trident_of_the_swamp'],
+'Mystic hat':['Shop / GE','Buy it on the Grand Exchange or from the appropriate magic-equipment shops.','https://oldschool.runescape.wiki/w/Mystic_hat'],
+'Ahrim’s hood':['Barrows / GE','Buy it on the Grand Exchange or obtain it from the Barrows reward chest.','https://oldschool.runescape.wiki/w/Ahrim%27s_hood'],
+'Mystic robe top':['Shop / GE','Buy it on the Grand Exchange or from the appropriate magic-equipment shops.','https://oldschool.runescape.wiki/w/Mystic_robe_top'],
+'Ahrim’s robetop':['Barrows / GE','Buy it on the Grand Exchange or obtain it from the Barrows reward chest.','https://oldschool.runescape.wiki/w/Ahrim%27s_robetop'],
+'God cape':['Mage Arena','Complete the Mage Arena activity and choose a god cape.','https://oldschool.runescape.wiki/w/God_capes'],
+'Imbued god cape':['Mage Arena II','Complete The Mage Arena II miniquest and imbue the corresponding god cape.','https://oldschool.runescape.wiki/w/Imbued_god_cape'],
+'Occult necklace':['Drop / GE','Buy it on the Grand Exchange or obtain it from smoke devils/thermonuclear smoke devil (93 Slayer).','https://oldschool.runescape.wiki/w/Occult_necklace'],
+'Tormented bracelet':['Craft / GE','Buy it on the Grand Exchange, or enchant a zenyte bracelet.','https://oldschool.runescape.wiki/w/Tormented_bracelet']
+};
+function gearGetHtml(item){
+ const g=GEAR_GET[item];if(!g)return '<div class="muted">Acquisition details are not available yet.</div>';
+ return '<div class="card"><b>How to get it</b><div class="badges"><span class="badge good">'+esc(g[0])+'</span></div><div style="margin-top:8px">'+esc(g[1])+'</div><div style="margin-top:10px"><a href="'+g[2]+'" target="_blank" rel="noopener">Open OSRS Wiki guide ↗</a></div></div>';
+}
+function toggleGearGet(id,item){
+ const el=document.getElementById(id);if(!el)return;const open=el.innerHTML.trim();el.innerHTML=open?'':gearGetHtml(item);
+}
 function liveLevel(skill){const x=(appData&&appData.stats||[]).find(v=>String(v.skill).toLowerCase()===String(skill).toLowerCase());return Number(x&&x.level)||1}
 function renderGear(){
   if(!appData)return;
@@ -509,7 +555,7 @@ function renderGear(){
   rows.sort((a,b)=>b[5]-a[5]||a[1].localeCompare(b[1]));
   const blocked=GEAR.filter(x=>x[0]===style&&liveLevel(x[4])<x[3]).length;
   document.getElementById('gearStatus').textContent=rows.length+' upgrades shown'+(!all?' • '+blocked+' future upgrades hidden':'');
-  document.getElementById('gearList').innerHTML=rows.map(x=>{const ok=liveLevel(x[4])>=x[3];return '<div class="card"><div class="row"><span><b>'+esc(x[2])+'</b><br><small>'+esc(x[1])+' • Requires '+esc(x[4])+' '+x[3]+'</small></span><b>'+('★★★★★'.slice(0,x[5]))+'</b></div><div class="badges"><span class="badge '+(ok?'good':'bad')+'">'+(ok?'Available':'Future')+'</span><span class="badge">Priority '+x[5]+'/5</span></div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div></div>'}).join('')||'<div class="empty">No gear upgrades match these filters.</div>';
+  document.getElementById('gearList').innerHTML=rows.map(x=>{const ok=liveLevel(x[4])>=x[3];return '<div class="card" onclick="toggleGearGet(\'gearGet'+GEAR.indexOf(x)+'\',\''+String(x[2]).replace(/'/g,"\\'")+'\')"><div class="row"><span><b>'+esc(x[2])+'</b><br><small>'+esc(x[1])+' • Requires '+esc(x[4])+' '+x[3]+'</small></span><b>'+('★★★★★'.slice(0,x[5]))+'</b></div><div class="badges"><span class="badge '+(ok?'good':'bad')+'">'+(ok?'Available':'Future')+'</span><span class="badge">Priority '+x[5]+'/5</span><span class="badge">Tap for how to get</span></div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div><div id="gearGet'+GEAR.indexOf(x)+'"></div></div>'}).join('')||'<div class="empty">No gear upgrades match these filters.</div>';
 }
 const SLAYER_TASKS=[
 ['Abyssal demons',85,'Duradel,Nieve / Steve',5,'gp','Abyssal whip chance; strong profit task.','Slayer Tower / Catacombs','Barrage'],
@@ -575,7 +621,7 @@ function renderUpgrades(){
  if(view==='next'){const seen={};rows=rows.filter(r=>{const k=r.x[0]+'|'+r.x[1];if(seen[k])return false;seen[k]=1;return true;});}
  const priced=rows.filter(r=>r.price>0).length;
  document.getElementById('upgradeStatus').textContent=rows.filter(r=>r.ready&&!r.owned).length+' usable upgrades • '+Object.values(o).filter(Boolean).length+' owned • '+priced+' live prices';
- document.getElementById('upgradeList').innerHTML=rows.map((r,i)=>{const x=r.x;return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[2])+'</b><br><small>'+esc(x[0])+' • '+esc(x[1])+'</small></span><button class="refresh" onclick="toggleOwnedGear(\''+String(x[2]).replace(/'/g,"\\'")+'\')">'+(r.owned?'Owned ✓':'Mark owned')+'</button></div><div class="badges"><span class="badge '+(r.ready?'good':'bad')+'">'+(r.ready?'Usable now':esc(x[4])+' '+x[3])+'</span><span class="badge">Priority '+x[5]+'/5</span>'+(r.price?'<span class="badge">'+fmt(r.price)+' GP</span>':'')+'</div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div></div>'}).join('')||'<div class="empty">No upgrades match these filters.</div>';
+ document.getElementById('upgradeList').innerHTML=rows.map((r,i)=>{const x=r.x;return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[2])+'</b><br><small>'+esc(x[0])+' • '+esc(x[1])+'</small></span><button class="refresh" onclick="toggleOwnedGear(\''+String(x[2]).replace(/'/g,"\\'")+'\')">'+(r.owned?'Owned ✓':'Mark owned')+'</button></div><div class="badges"><span class="badge '+(r.ready?'good':'bad')+'">'+(r.ready?'Usable now':esc(x[4])+' '+x[3])+'</span><span class="badge">Priority '+x[5]+'/5</span>'+(r.price?'<span class="badge">'+fmt(r.price)+' GP</span>':'')+'</div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div><button class="refresh" style="margin-top:8px" onclick="event.stopPropagation();toggleGearGet(\'upgradeGet'+GEAR.indexOf(x)+'\',\''+String(x[2]).replace(/'/g,"\\'")+'\')">How to get</button><div id="upgradeGet'+GEAR.indexOf(x)+'"></div></div>'}).join('')||'<div class="empty">No upgrades match these filters.</div>';
 }
 function slayerTaskState(){try{return JSON.parse(localStorage.getItem('osrsSlayerTask')||'null')}catch(e){return null}}
 function slayerHistoryState(){try{return JSON.parse(localStorage.getItem('osrsSlayerHistory')||'[]')}catch(e){return []}}
@@ -667,7 +713,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=33');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=34');
 loadData(false);
 </script>
 </body></html>
