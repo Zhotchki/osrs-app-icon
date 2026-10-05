@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=35">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=35">
+<link rel="manifest" href="./manifest.webmanifest?v=36">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=36">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v35</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v36</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -123,28 +123,22 @@ function fmt(n){return Number(n||0).toLocaleString()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function statusClass(s){s=String(s||'').toLowerCase();return /complete|yes|success|profit|unlocked/.test(s)?'ok':(/incomplete|no|locked|error|missing/.test(s)?'bad':'')}
 
+async function fetchJsonWithTimeout(url,ms=12000){
+ const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
+ try{const r=await fetch(url+(url.includes('?')?'&':'?')+'_='+Date.now(),{cache:'no-store',redirect:'follow',signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json()}finally{clearTimeout(t)}
+}
 async function loadData(manual=false){
-  const st=document.getElementById('statusText'); const box=document.getElementById('errorBox');
-  st.textContent=manual?'Refreshing…':'Connecting…'; box.innerHTML='';
-  try{
-    let r,j,lastErr;
-    for(const url of [API,API_FALLBACK]){
-      try{
-        r=await fetch(url+(url.includes('?')?'&':'?')+'_='+Date.now(),{cache:'no-store',redirect:'follow'});
-        if(!r.ok) throw new Error('HTTP '+r.status);
-        j=await r.json(); lastErr=null; break;
-      }catch(err){lastErr=err}
-    }
-    if(lastErr) throw lastErr;
-    if(!j.ok) throw new Error('Backend returned an error');
-    appData=j.data||{};
-    render();
-    st.textContent='Connected • '+(appData.refreshStatus||'Live data loaded');
-  }catch(e){
-    st.textContent='Connection failed';
-    box.innerHTML='<div class="card error"><b>Live data could not load.</b><div class="muted">'+esc(e.message)+'</div><div class="muted" style="margin-top:8px">The app will retry automatically. You can also tap Refresh.</div></div>';
-    if(!manual) setTimeout(()=>loadData(false),5000);
-  }
+ const st=document.getElementById('statusText'),box=document.getElementById('errorBox'),btn=document.getElementById('refreshBtn');
+ st.textContent=manual?'Refreshing…':'Connecting…';box.innerHTML='';if(btn){btn.disabled=true;btn.textContent='Loading…'}
+ try{
+  let j,lastErr;
+  for(const url of [...new Set([API,API_FALLBACK])]){try{j=await fetchJsonWithTimeout(url);lastErr=null;break}catch(err){lastErr=err}}
+  if(lastErr)throw lastErr;if(!j||!j.ok)throw new Error('Backend returned an error');
+  appData=j.data||{};render();st.textContent='Connected • '+(appData.refreshStatus||'Live data loaded');
+ }catch(e){
+  const timed=e&&e.name==='AbortError';st.textContent=timed?'Connection timed out':'Connection failed';
+  box.innerHTML='<div class="card error"><b>Live data could not load.</b><div class="muted">'+esc(timed?'The OSRS data service did not respond within 12 seconds.':e.message)+'</div><div class="muted" style="margin-top:8px">Your app controls remain available. Tap Refresh to try again.</div></div>';
+ }finally{if(btn){btn.disabled=false;btn.textContent='Refresh'}}
 }
 
 function render(){
@@ -713,7 +707,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=35',{updateViaCache:'none'}).then(r=>r.update());
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=36',{updateViaCache:'none'}).then(r=>r.update());
 loadData(false);
 </script>
 </body></html>
