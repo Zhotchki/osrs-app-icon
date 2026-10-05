@@ -489,9 +489,21 @@ function getMobileAppData() {
   return {
     player,
     lastRefresh: settings ? settings.getRange('G14').getDisplayValue() : '',
-    refreshStatus: settings ? settings.getRange('G15').getDisplayValue() : '',
+    refreshStatus: sanitizeMobileRefreshStatus_(settings ? settings.getRange('G15').getDisplayValue() : ''),
     stats, fastest, quests, diaries
   };
+}
+
+
+function sanitizeMobileRefreshStatus_(status) {
+  const text = String(status || '').trim();
+  // G15 can retain a failure message from a previous deployed version even
+  // after that underlying code error has been fixed. Do not surface that
+  // obsolete WikiSync constant error in the mobile app.
+  if (/WIKISYNC_CACHE_SHEET_\s+is\s+not\s+defined/i.test(text)) {
+    return 'Live data loaded';
+  }
+  return text;
 }
 
 function getMobileOptimizer(skill, objective, showLocked, targetLevel) {
