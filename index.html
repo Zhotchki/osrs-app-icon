@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10140f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=6">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=6">
+<link rel="manifest" href="./manifest.webmanifest?v=7">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=7">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{position:sticky;top:0;z-index:4;background:rgba(15,19,14,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}
+header{position:sticky;top:0;z-index:4;background:var(--bg);border-bottom:1px solid var(--line);padding:calc(14px + env(safe-area-inset-top)) 16px 14px}
 .wrap{max-width:860px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;color:var(--gold);font-size:22px}.sub{font-size:12px;color:var(--muted)}
-main{padding:14px 16px 90px}.hero,.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
+main{padding:14px 16px calc(90px + env(safe-area-inset-bottom))}.hero,.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0}
 .hero h1{font-size:22px;margin:0 0 4px}.muted{color:var(--muted);font-size:13px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#273421;color:var(--gold);font-size:12px;font-weight:700}
 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.tabs button,.refresh{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:10px;font-weight:800}
 .tabs button.active{background:var(--gold);color:#1a160c}.refresh{width:auto;padding:9px 12px}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v6</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v7</span></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
 <button data-tab="training">Training</button>
@@ -90,7 +90,7 @@ function renderQuests(){
   const f=q.filter(x=>String(x.name||'').toLowerCase().includes(term));
   document.getElementById('questList').innerHTML=f.length?f.map(x=>'<div class="card"><div class="row"><span>'+esc(x.name)+'</span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div></div>').join(''):'<div class="empty">No matching quests.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=6');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=7');
 loadData(false);
 </script>
 </body></html>
