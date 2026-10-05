@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=26">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=26">
+<link rel="manifest" href="./manifest.webmanifest?v=27">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=27">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v26</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v27</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -59,7 +59,7 @@ small{color:var(--muted)}
 <section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
 <section id="next" class="section"><div class="card"><b>What Should I Do Next?</b><div class="muted" style="margin-top:4px">Prioritized from your live levels plus quest and diary readiness.</div><div class="toolbar"><select id="nextFocus"><option value="balanced">Balanced progression</option><option value="quests">Quests</option><option value="diaries">Achievement diaries</option><option value="skills">Skills</option></select></div></div><div id="nextStatus" class="muted"></div><div id="nextList"></div></section>
 <section id="roadmap" class="section"><div class="card"><b>Account Roadmap</b><div class="muted" style="margin-top:4px">Choose a milestone and get a live-stat progression path.</div><div class="toolbar"><select id="roadmapGoal"><option value="fire">Fire Cape</option><option value="barrows">Barrows Gloves</option><option value="torso">Fighter Torso</option><option value="slayer85">85 Slayer</option><option value="base70">Base 70 Skills</option><option value="quest">Quest Progression</option><option value="diary">Achievement Diaries</option></select></div></div><div id="roadmapStatus" class="muted"></div><div id="roadmapList"></div></section>
-<section id="slayer" class="section"><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
+<section id="slayer" class="section"><div class="card"><b>Current Slayer Task</b><div class="toolbar"><input id="slayerCurrent" placeholder="Monster / task"><input id="slayerKills" type="number" min="0" placeholder="Kills remaining"><button class="refresh" id="saveSlayerTask">Save</button></div><div id="slayerCurrentStatus" class="muted"></div><div class="toolbar"><button class="refresh" id="slayerMinus">-1 Kill</button><button class="refresh" id="slayerComplete">Complete Task</button></div></div><div class="card"><b>Recent Task History</b><div id="slayerHistory" class="muted" style="margin-top:8px"></div></div><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
 <section id="upgrades" class="section"><div class="card"><b>Gear Upgrade Planner</b><div class="muted" style="margin-top:4px">Prioritize usable upgrades by combat style. Mark items you already own to keep the list focused.</div><div class="toolbar"><select id="upgradeStyle"><option>All</option><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="upgradeView"><option value="next">Best next upgrades</option><option value="all">All usable gear</option><option value="future">Include future unlocks</option></select></div></div><div id="upgradeStatus" class="muted"></div><div id="upgradeList"></div></section>
 <section id="activities" class="section"><div class="card"><b>Minigames & Activities</b><div class="muted" style="margin-top:4px">Account-progression activities filtered using your live skill levels.</div><div class="toolbar"><select id="activityFilter"><option value="next">Worth doing next</option><option value="ready">Ready now</option><option value="all">Show all</option></select><input id="activitySearch" placeholder="Search activities…"></div></div><div id="activityStatus" class="muted"></div><div id="activityList"></div></section>
@@ -95,6 +95,9 @@ document.getElementById('slayerSearch').addEventListener('input',renderSlayerCom
 ['upgradeStyle','upgradeView'].forEach(id=>document.getElementById(id).addEventListener('change',renderUpgrades));
 document.getElementById('activityFilter').addEventListener('change',renderActivities);
 document.getElementById('activitySearch').addEventListener('input',renderActivities);
+document.getElementById('saveSlayerTask').addEventListener('click',saveSlayerTask);
+document.getElementById('slayerMinus').addEventListener('click',()=>adjustSlayerTask(-1));
+document.getElementById('slayerComplete').addEventListener('click',completeSlayerTask);
 ['farmView','farmLocked'].forEach(id=>document.getElementById(id).addEventListener('change',renderFarmPlanner));
 document.getElementById('runHerblore').addEventListener('click',runHerblore);
 document.getElementById('skillSearch').addEventListener('input',renderSkills);
@@ -143,7 +146,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderUpgrades(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap(); renderRoutine();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderSlayerTracker(); renderGear(); renderUpgrades(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap(); renderRoutine();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -463,6 +466,32 @@ function renderUpgrades(){
  document.getElementById('upgradeStatus').textContent=rows.filter(r=>r.ready&&!r.owned).length+' usable upgrades • '+Object.values(o).filter(Boolean).length+' owned • '+priced+' live prices';
  document.getElementById('upgradeList').innerHTML=rows.map((r,i)=>{const x=r.x;return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[2])+'</b><br><small>'+esc(x[0])+' • '+esc(x[1])+'</small></span><button class="refresh" onclick="toggleOwnedGear(\''+String(x[2]).replace(/'/g,"\\'")+'\')">'+(r.owned?'Owned ✓':'Mark owned')+'</button></div><div class="badges"><span class="badge '+(r.ready?'good':'bad')+'">'+(r.ready?'Usable now':esc(x[4])+' '+x[3])+'</span><span class="badge">Priority '+x[5]+'/5</span>'+(r.price?'<span class="badge">'+fmt(r.price)+' GP</span>':'')+'</div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div></div>'}).join('')||'<div class="empty">No upgrades match these filters.</div>';
 }
+function slayerTaskState(){try{return JSON.parse(localStorage.getItem('osrsSlayerTask')||'null')}catch(e){return null}}
+function slayerHistoryState(){try{return JSON.parse(localStorage.getItem('osrsSlayerHistory')||'[]')}catch(e){return []}}
+function saveSlayerTask(){
+ const name=document.getElementById('slayerCurrent').value.trim(),kills=Math.max(0,Number(document.getElementById('slayerKills').value)||0);
+ if(!name)return;
+ localStorage.setItem('osrsSlayerTask',JSON.stringify({name,kills,startKills:kills,started:Date.now()}));renderSlayerTracker();
+}
+function adjustSlayerTask(n){
+ const t=slayerTaskState();if(!t)return;t.kills=Math.max(0,(Number(t.kills)||0)+n);localStorage.setItem('osrsSlayerTask',JSON.stringify(t));renderSlayerTracker();
+}
+function completeSlayerTask(){
+ const t=slayerTaskState();if(!t)return;const h=slayerHistoryState();h.unshift({name:t.name,count:t.startKills||0,completed:Date.now()});localStorage.setItem('osrsSlayerHistory',JSON.stringify(h.slice(0,25)));localStorage.removeItem('osrsSlayerTask');renderSlayerTracker();
+}
+function renderSlayerTracker(){
+ const t=slayerTaskState(),h=slayerHistoryState();
+ if(t){document.getElementById('slayerCurrent').value=t.name;document.getElementById('slayerKills').value=t.kills;document.getElementById('slayerCurrentStatus').textContent=t.kills+' kills remaining';}
+ else{document.getElementById('slayerCurrent').value='';document.getElementById('slayerKills').value='';document.getElementById('slayerCurrentStatus').textContent='No active task saved';}
+ document.getElementById('slayerHistory').innerHTML=h.length?h.map(x=>'<div class="row" style="margin-bottom:6px"><span>'+esc(x.name)+'</span><span>'+esc(String(x.count||''))+' kills</span></div>').join(''):'No completed tasks recorded yet.';
+}
+function slayerDecision(task){
+ const rating=Number(task[3])||0,focus=task[4];
+ if(rating>=5)return 'Keep';
+ if(rating>=4)return focus==='gp'?'Keep / profit':'Keep';
+ if(rating<=2)return 'Skip / block candidate';
+ return 'Situational';
+}
 function slayerStyle(task){
   const n=String(task[0]).toLowerCase();
   if(/dust devil|nechryael|jell/.test(n)) return 'Magic';
@@ -527,7 +556,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=26');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=27');
 loadData(false);
 </script>
 </body></html>
