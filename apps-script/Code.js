@@ -493,7 +493,9 @@ function getMobileAppData() {
   const alchSheet = ss.getSheetByName('High_Alchemy');
   let highAlchemy = [];
   if (alchSheet && alchSheet.getLastRow() >= 2) {
-    const vals = alchSheet.getDataRange().getDisplayValues();
+    const rowCount = Math.min(alchSheet.getLastRow(), 301);
+    const colCount = Math.min(Math.max(alchSheet.getLastColumn(), 1), 12);
+    const vals = alchSheet.getRange(1,1,rowCount,colCount).getDisplayValues();
     const headers = vals[0].map(x=>String(x||'').trim());
     const col = name => headers.indexOf(name);
     const cItem=col('Item'), cBuy=col('Cost Used'), cAlch=col('High Alch Value'),
@@ -518,7 +520,8 @@ function getMobileAppData() {
   const priceSheet = ss.getSheetByName('Price_Data');
   let gearPrices = [];
   if (priceSheet && priceSheet.getLastRow() > 1) {
-    gearPrices = priceSheet.getRange(2,1,priceSheet.getLastRow()-1,7).getValues()
+    const priceRows = Math.min(priceSheet.getLastRow()-1, 5000);
+    gearPrices = priceSheet.getRange(2,1,priceRows,7).getValues()
       .filter(r=>gearNames.has(String(r[0]||'').toLowerCase()))
       .map(r=>({item:r[0],id:r[1],buy:r[2],sell:r[3],mid:r[6]}));
   }
