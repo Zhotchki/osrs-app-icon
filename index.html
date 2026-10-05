@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=23">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=23">
+<link rel="manifest" href="./manifest.webmanifest?v=24">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=24">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,13 +30,14 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v23</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v24</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
 <button data-tab="training">Training</button>
 <button data-tab="slayer">Slayer</button>
 <button data-tab="gear">Gear</button>
+<button data-tab="upgrades">Upgrades</button>
 <button data-tab="activities">Activities</button>
 <button data-tab="quests">Quests</button>
 <button data-tab="diaries">Diaries</button>
@@ -59,6 +60,7 @@ small{color:var(--muted)}
 <section id="roadmap" class="section"><div class="card"><b>Account Roadmap</b><div class="muted" style="margin-top:4px">Choose a milestone and get a live-stat progression path.</div><div class="toolbar"><select id="roadmapGoal"><option value="fire">Fire Cape</option><option value="barrows">Barrows Gloves</option><option value="torso">Fighter Torso</option><option value="slayer85">85 Slayer</option><option value="base70">Base 70 Skills</option><option value="quest">Quest Progression</option><option value="diary">Achievement Diaries</option></select></div></div><div id="roadmapStatus" class="muted"></div><div id="roadmapList"></div></section>
 <section id="slayer" class="section"><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
+<section id="upgrades" class="section"><div class="card"><b>Gear Upgrade Planner</b><div class="muted" style="margin-top:4px">Prioritize usable upgrades by combat style. Mark items you already own to keep the list focused.</div><div class="toolbar"><select id="upgradeStyle"><option>All</option><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="upgradeView"><option value="next">Best next upgrades</option><option value="all">All usable gear</option><option value="future">Include future unlocks</option></select></div></div><div id="upgradeStatus" class="muted"></div><div id="upgradeList"></div></section>
 <section id="activities" class="section"><div class="card"><b>Minigames & Activities</b><div class="muted" style="margin-top:4px">Account-progression activities filtered using your live skill levels.</div><div class="toolbar"><select id="activityFilter"><option value="next">Worth doing next</option><option value="ready">Ready now</option><option value="all">Show all</option></select><input id="activitySearch" placeholder="Search activities…"></div></div><div id="activityStatus" class="muted"></div><div id="activityList"></div></section>
 <section id="farming" class="section"><div class="card"><b>Farming & Herb Runs</b><div class="muted" style="margin-top:4px">Build a run from patches and herbs available at your live Farming level.</div><div class="toolbar"><select id="farmView"><option value="herbs">Herb run</option><option value="trees">Tree run</option><option value="patches">Patch unlocks</option></select><select id="farmLocked"><option value="ready">Available now</option><option value="all">Show locked</option></select></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
 <section id="herblore" class="section"><div class="card"><b>Herblore Planner</b><div class="muted" style="margin-top:4px">Compare unlocked Herblore methods using the potion and live GE data already maintained by your spreadsheet.</div><div class="toolbar"><select id="herbObjective"><option>Fastest XP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Best GP/hr</option><option>Shortest Time</option></select><input id="herbTarget" type="number" min="2" max="99" value="99"></div><button class="refresh" id="runHerblore">Compare Potions</button></div><div id="herbStatus" class="muted"></div><div id="herbList"></div></section>
@@ -86,6 +88,7 @@ document.getElementById('roadmapGoal').addEventListener('change',renderRoadmap);
 ['slayerObjective','slayerMaster','slayerAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderSlayerCompanion));
 document.getElementById('slayerSearch').addEventListener('input',renderSlayerCompanion);
 ['gearStyle','gearAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderGear));
+['upgradeStyle','upgradeView'].forEach(id=>document.getElementById(id).addEventListener('change',renderUpgrades));
 document.getElementById('activityFilter').addEventListener('change',renderActivities);
 document.getElementById('activitySearch').addEventListener('input',renderActivities);
 ['farmView','farmLocked'].forEach(id=>document.getElementById(id).addEventListener('change',renderFarmPlanner));
@@ -136,7 +139,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderUpgrades(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -401,6 +404,25 @@ const SLAYER_TASKS=[
 ['Ankou',1,'Vannaka,Konar',3,'overall','Simple task; Catacombs version offers ancient shards/totem pieces.','Stronghold / Catacombs',''],
 ['Fire giants',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',2,'overall','Straightforward combat task.','Multiple','']
 ];
+function ownedGear(){
+ try{return JSON.parse(localStorage.getItem('osrsOwnedGear')||'{}')}catch(e){return {}}
+}
+function toggleOwnedGear(item){
+ const o=ownedGear(); o[item]=!o[item]; localStorage.setItem('osrsOwnedGear',JSON.stringify(o)); renderUpgrades();
+}
+function renderUpgrades(){
+ if(!appData)return;
+ const style=document.getElementById('upgradeStyle').value,view=document.getElementById('upgradeView').value,o=ownedGear();
+ let rows=GEAR.map(x=>({x,ready:liveLevel(x[4])>=x[3],owned:!!o[x[2]]}))
+   .filter(r=>(style==='All'||r.x[0]===style)&&(view==='future'||r.ready));
+ if(view==='next')rows=rows.filter(r=>!r.owned).sort((a,b)=>(b.ready-a.ready)||(b.x[5]-a.x[5])||(a.x[3]-b.x[3]));
+ else rows.sort((a,b)=>(b.ready-a.ready)||(b.x[5]-a.x[5]));
+ if(view==='next'){
+   const seen={}; rows=rows.filter(r=>{const k=r.x[0]+'|'+r.x[1];if(seen[k])return false;seen[k]=1;return true;});
+ }
+ document.getElementById('upgradeStatus').textContent=rows.filter(r=>r.ready&&!r.owned).length+' usable upgrades • '+Object.values(o).filter(Boolean).length+' owned';
+ document.getElementById('upgradeList').innerHTML=rows.map((r,i)=>{const x=r.x;return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[2])+'</b><br><small>'+esc(x[0])+' • '+esc(x[1])+'</small></span><button class="refresh" onclick="toggleOwnedGear(\''+String(x[2]).replace(/'/g,"\\'")+'\')">'+(r.owned?'Owned ✓':'Mark owned')+'</button></div><div class="badges"><span class="badge '+(r.ready?'good':'bad')+'">'+(r.ready?'Usable now':esc(x[4])+' '+x[3])+'</span><span class="badge">Priority '+x[5]+'/5</span></div><div class="muted" style="margin-top:8px">'+esc(x[6])+'</div></div>'}).join('')||'<div class="empty">No upgrades match these filters.</div>';
+}
 function slayerStyle(task){
   const n=String(task[0]).toLowerCase();
   if(/dust devil|nechryael|jell/.test(n)) return 'Magic';
@@ -465,7 +487,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=23');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=24');
 loadData(false);
 </script>
 </body></html>
