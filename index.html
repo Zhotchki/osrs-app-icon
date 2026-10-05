@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=20">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=20">
+<link rel="manifest" href="./manifest.webmanifest?v=21">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=21">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v20</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v21</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -56,7 +56,7 @@ small{color:var(--muted)}
 <section id="slayer" class="section"><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
 <section id="activities" class="section"><div class="card"><b>Minigames & Activities</b><div class="muted" style="margin-top:4px">Account-progression activities filtered using your live skill levels.</div><div class="toolbar"><select id="activityFilter"><option value="next">Worth doing next</option><option value="ready">Ready now</option><option value="all">Show all</option></select><input id="activitySearch" placeholder="Search activities…"></div></div><div id="activityStatus" class="muted"></div><div id="activityList"></div></section>
-<section id="farming" class="section"><div class="card"><b>Farming & Herb Run Planner</b><div class="muted" style="margin-top:4px">Compare Farming methods from your existing training database using your live Farming level.</div><div class="toolbar"><select id="farmObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option></select><button class="refresh" id="runFarming">Find Methods</button></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
+<section id="farming" class="section"><div class="card"><b>Farming & Herb Runs</b><div class="muted" style="margin-top:4px">Build a run from patches and herbs available at your live Farming level.</div><div class="toolbar"><select id="farmView"><option value="herbs">Herb run</option><option value="trees">Tree run</option><option value="patches">Patch unlocks</option></select><select id="farmLocked"><option value="ready">Available now</option><option value="all">Show locked</option></select></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
 <section id="herblore" class="section"><div class="card"><b>Herblore Planner</b><div class="muted" style="margin-top:4px">Compare unlocked Herblore methods using the potion and live GE data already maintained by your spreadsheet.</div><div class="toolbar"><select id="herbObjective"><option>Fastest XP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Best GP/hr</option><option>Shortest Time</option></select><input id="herbTarget" type="number" min="2" max="99" value="99"></div><button class="refresh" id="runHerblore">Compare Potions</button></div><div id="herbStatus" class="muted"></div><div id="herbList"></div></section>
 <div id="errorBox"></div>
 </main>
@@ -82,7 +82,7 @@ document.getElementById('slayerSearch').addEventListener('input',renderSlayerCom
 ['gearStyle','gearAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderGear));
 document.getElementById('activityFilter').addEventListener('change',renderActivities);
 document.getElementById('activitySearch').addEventListener('input',renderActivities);
-document.getElementById('runFarming').addEventListener('click',()=>runSkillPlanner('Farming','farmObjective','farmStatus','farmList'));
+['farmView','farmLocked'].forEach(id=>document.getElementById(id).addEventListener('change',renderFarmPlanner));
 document.getElementById('runHerblore').addEventListener('click',runHerblore);
 document.getElementById('skillSearch').addEventListener('input',renderSkills);
 document.getElementById('skillSort').addEventListener('change',renderSkills);
@@ -130,7 +130,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderActivities();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderActivities(); renderFarmPlanner();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -192,6 +192,44 @@ function populateOptimizerSkills(){
   const el=document.getElementById('optSkill'); if(!el||el.options.length)return;
   const names=((appData&&appData.stats)||[]).map(x=>x.skill).filter(Boolean);
   el.innerHTML='<option>All Skills</option>'+names.map(x=>'<option>'+esc(x)+'</option>').join('');
+}
+const FARM_PATCHES=[
+['Falador','herbs',1,'Explorer’s ring teleport / nearby options','Herb patch; allotment; flower'],
+['Catherby','herbs',1,'Camelot/Catherby teleport','Herb patch; allotment; flower'],
+['Ardougne','herbs',1,'Ardougne cloak / teleport','Herb patch; allotment; flower'],
+['Morytania','herbs',1,'Ectophial / nearby teleport','Herb patch; allotment; flower'],
+['Hosidius','herbs',1,'Xeric’s talisman / nearby teleport','Herb patch; allotment; flower'],
+['Farming Guild','herbs',45,'Skills necklace / Farming cape','Herb patch plus many guild patches'],
+['Troll Stronghold','herbs',1,'Trollheim access','Disease-free herb patch after quest unlock'],
+['Weiss','herbs',1,'Icy basalt','Disease-free herb patch after quest unlock'],
+['Harmony Island','herbs',1,'Quest/diary access','Herb patch with account unlock requirements'],
+['Lumbridge','trees',15,'Lumbridge teleport','Tree patch'],
+['Varrock','trees',15,'Varrock teleport','Tree patch'],
+['Falador Park','trees',15,'Falador teleport','Tree patch'],
+['Taverley','trees',15,'Taverley/Falador access','Tree patch'],
+['Gnome Stronghold','trees',15,'Spirit tree / glider','Tree patch'],
+['Farming Guild','trees',65,'Skills necklace','Tree and fruit-tree progression']
+];
+const HERBS=[['Guam',9],['Marrentill',14],['Tarromin',19],['Harralander',26],['Ranarr',32],['Toadflax',38],['Irit',44],['Avantoe',50],['Kwuarm',56],['Snapdragon',62],['Cadantine',67],['Lantadyme',73],['Dwarf weed',79],['Torstol',85]];
+function renderFarmPlanner(){
+  if(!appData)return;
+  const lvl=liveLevel('Farming'), view=document.getElementById('farmView').value, showAll=document.getElementById('farmLocked').value==='all';
+  let html='', count=0;
+  if(view==='herbs'){
+    const herbs=HERBS.filter(x=>showAll||x[1]<=lvl).sort((a,b)=>b[1]-a[1]);
+    const patches=FARM_PATCHES.filter(x=>x[1]==='herbs'&&(showAll||x[2]<=lvl));
+    count=patches.length;
+    html='<div class="card"><b>Herbs you can grow</b><div class="badges" style="margin-top:8px">'+herbs.map(x=>'<span class="badge '+(x[1]<=lvl?'good':'bad')+'">'+esc(x[0])+' • '+x[1]+'</span>').join('')+'</div></div>'+
+      patches.map((x,i)=>'<div class="card"><div class="row"><span><b>'+(i+1)+'. '+esc(x[0])+'</b><br><small>'+esc(x[3])+'</small></span><span class="badge '+(x[2]<=lvl?'good':'bad')+'">'+(x[2]<=lvl?'Ready':'Farming '+x[2])+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[4])+'</div></div>').join('');
+  }else if(view==='trees'){
+    const rows=FARM_PATCHES.filter(x=>x[1]==='trees'&&(showAll||x[2]<=lvl)); count=rows.length;
+    html=rows.map((x,i)=>'<div class="card"><div class="row"><span><b>'+(i+1)+'. '+esc(x[0])+'</b><br><small>'+esc(x[3])+'</small></span><span class="badge '+(x[2]<=lvl?'good':'bad')+'">'+(x[2]<=lvl?'Ready':'Farming '+x[2])+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[4])+'</div></div>').join('');
+  }else{
+    const rows=FARM_PATCHES.filter(x=>showAll||x[2]<=lvl); count=rows.length;
+    html=rows.map(x=>'<div class="card"><div class="row"><span><b>'+esc(x[0])+'</b><br><small>'+esc(x[1]==='herbs'?'Herb run':'Tree run')+' • '+esc(x[3])+'</small></span><span class="badge '+(x[2]<=lvl?'good':'bad')+'">'+(x[2]<=lvl?'Available':'Farming '+x[2])+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[4])+'</div></div>').join('');
+  }
+  document.getElementById('farmStatus').textContent='Farming '+lvl+' • '+count+' locations shown';
+  document.getElementById('farmList').innerHTML=html||'<div class="empty">No farming options match these filters.</div>';
 }
 const ACTIVITIES=[
 ['Barbarian Assault','Combat',40,'Defence',5,'Fighter torso; Kandarin diary requirement','Team combat minigame. Fighter torso is a major melee progression reward.'],
@@ -368,7 +406,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=20');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=21');
 loadData(false);
 </script>
 </body></html>
