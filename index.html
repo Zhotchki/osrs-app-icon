@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=25">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=25">
+<link rel="manifest" href="./manifest.webmanifest?v=26">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=26">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v25</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v26</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -46,6 +46,7 @@ small{color:var(--muted)}
 <button data-tab="goals">Goals</button>
 <button data-tab="next">Next Up</button>
 <button data-tab="roadmap">Roadmap</button>
+<button data-tab="routine">Routine</button>
 <button data-tab="farming">Farming</button>
 <button data-tab="herblore">Herblore</button>
 </div>
@@ -62,6 +63,7 @@ small{color:var(--muted)}
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
 <section id="upgrades" class="section"><div class="card"><b>Gear Upgrade Planner</b><div class="muted" style="margin-top:4px">Prioritize usable upgrades by combat style. Mark items you already own to keep the list focused.</div><div class="toolbar"><select id="upgradeStyle"><option>All</option><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="upgradeView"><option value="next">Best next upgrades</option><option value="all">All usable gear</option><option value="future">Include future unlocks</option></select></div></div><div id="upgradeStatus" class="muted"></div><div id="upgradeList"></div></section>
 <section id="activities" class="section"><div class="card"><b>Minigames & Activities</b><div class="muted" style="margin-top:4px">Account-progression activities filtered using your live skill levels.</div><div class="toolbar"><select id="activityFilter"><option value="next">Worth doing next</option><option value="ready">Ready now</option><option value="all">Show all</option></select><input id="activitySearch" placeholder="Search activities…"></div></div><div id="activityStatus" class="muted"></div><div id="activityList"></div></section>
+<section id="routine" class="section"><div class="card"><b>Daily / Weekly Tracker</b><div class="muted" style="margin-top:4px">Recurring account activities with persistent completion tracking and timers.</div><div class="toolbar"><select id="routineView"><option value="ready">Ready now</option><option value="all">All activities</option><option value="daily">Daily / repeatable</option><option value="weekly">Weekly</option></select><button class="refresh" id="routineReset">Reset completed</button></div></div><div id="routineStatus" class="muted"></div><div id="routineList"></div></section>
 <section id="farming" class="section"><div class="card"><b>Farming & Herb Runs</b><div class="muted" style="margin-top:4px">Build a run from patches and herbs available at your live Farming level.</div><div class="toolbar"><select id="farmView"><option value="herbs">Herb run</option><option value="trees">Tree run</option><option value="patches">Patch unlocks</option></select><select id="farmLocked"><option value="ready">Available now</option><option value="all">Show locked</option></select></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
 <section id="herblore" class="section"><div class="card"><b>Herblore Planner</b><div class="muted" style="margin-top:4px">Compare unlocked Herblore methods using the potion and live GE data already maintained by your spreadsheet.</div><div class="toolbar"><select id="herbObjective"><option>Fastest XP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Best GP/hr</option><option>Shortest Time</option></select><input id="herbTarget" type="number" min="2" max="99" value="99"></div><button class="refresh" id="runHerblore">Compare Potions</button></div><div id="herbStatus" class="muted"></div><div id="herbList"></div></section>
 <div id="errorBox"></div>
@@ -85,6 +87,8 @@ document.getElementById('goalSkill').addEventListener('change',renderGoal);
 document.getElementById('goalTarget').addEventListener('input',renderGoal);
 document.getElementById('nextFocus').addEventListener('change',renderNextUp);
 document.getElementById('roadmapGoal').addEventListener('change',renderRoadmap);
+document.getElementById('routineView').addEventListener('change',renderRoutine);
+document.getElementById('routineReset').addEventListener('click',()=>{localStorage.removeItem('osrsRoutine');renderRoutine()});
 ['slayerObjective','slayerMaster','slayerAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderSlayerCompanion));
 document.getElementById('slayerSearch').addEventListener('input',renderSlayerCompanion);
 ['gearStyle','gearAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderGear));
@@ -139,7 +143,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderUpgrades(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderGear(); renderUpgrades(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap(); renderRoutine();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -196,6 +200,39 @@ function renderGoal(){
   const method=(appData.fastest||[]).find(x=>x.skill===skill), rate=method?Number(method.xpHr||0):0, hours=rate?remain/rate:0;
   const pct=targetXp?Math.max(0,Math.min(100,curXp/targetXp*100)):100;
   document.getElementById('goalResult').innerHTML='<div class="card"><div class="row"><span><b>'+esc(skill)+' '+fmt(stat.level)+' → '+target+'</b><br><small>'+fmt(remain)+' XP remaining</small></span><b>'+pct.toFixed(1)+'%</b></div><div class="progress"><i style="width:'+pct+'%"></i></div>'+(method?'<div class="row"><span><b>'+esc(method.method||'Fastest method')+'</b><br><small>'+fmt(rate)+' XP/hr</small></span><b>'+(hours?hours.toFixed(1)+' hr':'—')+'</b></div>':'<div class="muted" style="margin-top:10px">No training estimate is currently available for this skill.</div>')+'</div>';
+}
+const ROUTINES=[
+['Herb run','daily','Farming',9,80,'Herb patches','Repeat when your herbs are ready.'],
+['Birdhouse run','daily','Hunter',5,50,'Fossil Island','Useful passive Hunter XP and nests; requires Fossil Island access.'],
+['Farming contract','daily','Farming',45,0,'Farming Guild','Complete contracts as available for seed packs.'],
+['Fruit tree / tree run','daily','Farming',15,0,'Tree patches','Check planted trees when their growth cycle is complete.'],
+['Battlestaves','daily','Crafting',1,1440,'Varrock','Daily shop stock depends on account unlocks/diary progress.'],
+['Kingdom approval','daily','Woodcutting',1,1440,'Miscellania','Maintain approval when Kingdom management is unlocked.'],
+['Tears of Guthix','weekly','Quest',0,10080,'Tears of Guthix','Weekly XP activity after the quest and eligibility requirements.'],
+['Managing Miscellania','weekly','Quest',0,10080,'Miscellania','Review coffers and resource allocation when unlocked.']
+];
+function routineState(){try{return JSON.parse(localStorage.getItem('osrsRoutine')||'{}')}catch(e){return {}}}
+function saveRoutine(x){localStorage.setItem('osrsRoutine',JSON.stringify(x))}
+function routineReady(r){
+ if(r[2]==='Quest')return true;
+ return liveLevel(r[2])>=r[3];
+}
+function completeRoutine(name,mins){
+ const st=routineState();st[name]={done:Date.now(),readyAt:mins?Date.now()+mins*60000:0};saveRoutine(st);renderRoutine();
+}
+function undoRoutine(name){const st=routineState();delete st[name];saveRoutine(st);renderRoutine()}
+function routineTime(ms){
+ if(ms<=0)return 'Ready now';const m=Math.ceil(ms/60000);if(m<60)return m+'m';const h=Math.floor(m/60),rm=m%60;if(h<48)return h+'h '+rm+'m';return Math.floor(h/24)+'d '+(h%24)+'h';
+}
+function renderRoutine(){
+ if(!appData)return;
+ const view=document.getElementById('routineView').value,st=routineState(),now=Date.now();
+ let rows=ROUTINES.map(r=>({r,unlocked:routineReady(r),state:st[r[0]]||null}));
+ rows=rows.filter(o=>view==='all'||(view==='daily'&&o.r[1]==='daily')||(view==='weekly'&&o.r[1]==='weekly')||(view==='ready'&&o.unlocked&&(!o.state||!o.state.readyAt||o.state.readyAt<=now)));
+ rows.sort((a,b)=>{const ar=!a.state||!a.state.readyAt||a.state.readyAt<=now,br=!b.state||!b.state.readyAt||b.state.readyAt<=now;return br-ar||a.r[0].localeCompare(b.r[0])});
+ const ready=rows.filter(o=>o.unlocked&&(!o.state||!o.state.readyAt||o.state.readyAt<=now)).length;
+ document.getElementById('routineStatus').textContent=ready+' ready now • '+rows.length+' shown';
+ document.getElementById('routineList').innerHTML=rows.map(o=>{const r=o.r,remaining=o.state&&o.state.readyAt?o.state.readyAt-now:0,ready=remaining<=0;return '<div class="card"><div class="row"><span><b>'+esc(r[0])+'</b><br><small>'+esc(r[5])+' • '+esc(r[1])+'</small></span>'+(o.state&&!ready?'<button class="refresh" onclick="undoRoutine(\''+r[0].replace(/'/g,"\\'")+'\')">Undo</button>':'<button class="refresh" '+(!o.unlocked?'disabled':'')+' onclick="completeRoutine(\''+r[0].replace(/'/g,"\\'")+'\','+r[4]+')">Complete</button>')+'</div><div class="badges"><span class="badge '+(o.unlocked?'good':'bad')+'">'+(o.unlocked?(ready?'Ready now':routineTime(remaining)):(r[2]+' '+r[3]))+'</span></div><div class="muted" style="margin-top:8px">'+esc(r[6])+'</div></div>'}).join('')||'<div class="empty">Nothing is due in this view.</div>';
 }
 const ROADMAPS={
  fire:{name:'Fire Cape',steps:[['Ranged',70,'Build a strong ranged setup'],['Prayer',43,'Unlock protection prayers'],['Hitpoints',60,'Improve survivability']]},
@@ -490,7 +527,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=25');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=26');
 loadData(false);
 </script>
 </body></html>
