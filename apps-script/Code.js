@@ -506,11 +506,28 @@ function getMobileAppData() {
     }));
   }
 
+  const gearNames = new Set([
+    'Dragon scimitar','Abyssal whip','Abyssal tentacle','Helm of neitiznot','Neitiznot faceguard',
+    'Fighter torso','Bandos chestplate','Bandos tassets','Fire cape','Amulet of glory','Amulet of fury',
+    'Amulet of torture','Barrows gloves','Dragon boots','Magic shortbow (i)','Rune crossbow','Toxic blowpipe',
+    'Archer helm','Masori mask','Masori body','Black d’hide body','Blessed d’hide body','Ava’s accumulator',
+    'Ava’s assembler','Necklace of anguish','Pegasian boots',"Iban's staff",'Trident of the seas',
+    'Trident of the swamp','Mystic robe top',"Ahrim's robetop",'God cape','Imbued god cape','Occult necklace',
+    'Tormented bracelet'
+  ].map(x=>x.toLowerCase()));
+  const priceSheet = ss.getSheetByName('Price_Data');
+  let gearPrices = [];
+  if (priceSheet && priceSheet.getLastRow() > 1) {
+    gearPrices = priceSheet.getRange(2,1,priceSheet.getLastRow()-1,7).getValues()
+      .filter(r=>gearNames.has(String(r[0]||'').toLowerCase()))
+      .map(r=>({item:r[0],id:r[1],buy:r[2],sell:r[3],mid:r[6]}));
+  }
+
   return {
     player,
     lastRefresh: settings ? settings.getRange('G14').getDisplayValue() : '',
     refreshStatus: sanitizeMobileRefreshStatus_(settings ? settings.getRange('G15').getDisplayValue() : ''),
-    stats, fastest, quests, diaries, highAlchemy
+    stats, fastest, quests, diaries, highAlchemy, gearPrices
   };
 }
 
