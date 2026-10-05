@@ -1,5 +1,5 @@
-const CACHE='osrs-pwa-v19';
-const SHELL=['./','./index.html','./manifest.webmanifest?v=19','./apple-touch-icon.png?v=19'];
+const CACHE='osrs-pwa-v20';
+const SHELL=['./','./index.html','./manifest.webmanifest?v=20','./apple-touch-icon.png?v=20'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
