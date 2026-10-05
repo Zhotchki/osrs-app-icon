@@ -1,7 +1,12 @@
-name: Bootstrap and Deploy OSRS Apps Script
+name: Deploy OSRS Apps Script
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "apps-script/**"
+      - ".clasp.json"
 
 permissions:
   contents: write
@@ -28,29 +33,6 @@ jobs:
           chmod 600 "$HOME/.clasprc.json"
           node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('clasp credential JSON valid')"
 
-      - name: Pull complete live Apps Script project
-        run: |
-          rm -rf apps-script
-          mkdir -p apps-script
-          clasp pull
-
-      - name: Apply WikiSync cache constant fix
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path("apps-script/Code.js")
-          s = p.read_text()
-          definition = "const WIKISYNC_CACHE_SHEET_ = 'WikiSync_Cache';"
-          if definition not in s:
-              anchor = "const BACKEND_SHEETS_ = ['Price_Data','Levels','Potions','Skill_Methods','Apps_Script','WikiSync_Cache','Quest_Requirements_Cache'];"
-              if anchor not in s:
-                  raise SystemExit("BACKEND_SHEETS_ anchor not found; refusing to modify live source")
-              s = s.replace(anchor, anchor + "\n" + definition, 1)
-              p.write_text(s)
-          if s.count(definition) != 1:
-              raise SystemExit("Unexpected WikiSync constant count; refusing deployment")
-          PY
-
       - name: Verify complete project before push
         run: |
           test -s apps-script/Code.js
@@ -58,16 +40,6 @@ jobs:
           test -s apps-script/WikiSync.html
           test -s apps-script/appsscript.json
           grep -Fq "const WIKISYNC_CACHE_SHEET_ = 'WikiSync_Cache';" apps-script/Code.js
-
-      - name: Save verified live source to GitHub
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps-script
-          if ! git diff --cached --quiet; then
-            git commit -m "Sync live OSRS Apps Script and fix WikiSync cache constant"
-            git push
-          fi
 
       - name: Push verified source to Apps Script
         run: clasp push --force
