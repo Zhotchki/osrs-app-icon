@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=28">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=28">
+<link rel="manifest" href="./manifest.webmanifest?v=29">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=29">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v28</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v29</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -39,6 +39,7 @@ small{color:var(--muted)}
 <button data-tab="gear">Gear</button>
 <button data-tab="upgrades">Upgrades</button>
 <button data-tab="wealth">Wealth</button>
+<button data-tab="money">Money</button>
 <button data-tab="activities">Activities</button>
 <button data-tab="quests">Quests</button>
 <button data-tab="diaries">Diaries</button>
@@ -64,6 +65,7 @@ small{color:var(--muted)}
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
 <section id="upgrades" class="section"><div class="card"><b>Gear Upgrade Planner</b><div class="muted" style="margin-top:4px">Prioritize usable upgrades by combat style. Mark items you already own to keep the list focused.</div><div class="toolbar"><select id="upgradeStyle"><option>All</option><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="upgradeView"><option value="next">Best next upgrades</option><option value="all">All usable gear</option><option value="future">Include future unlocks</option></select></div></div><div id="upgradeStatus" class="muted"></div><div id="upgradeList"></div></section>
 <section id="wealth" class="section"><div class="card"><b>Bank / Wealth Planner</b><div class="muted" style="margin-top:4px">Set the GP you have available for upgrades. This is stored only on this device.</div><div class="toolbar"><input id="cashStack" type="number" min="0" step="1000" placeholder="Available GP"><button class="refresh" id="saveCash">Save GP</button></div></div><div id="wealthStatus" class="muted"></div><div id="wealthList"></div></section>
+<section id="money" class="section"><div class="card"><b>Money Maker Planner</b><div class="muted" style="margin-top:4px">Find profitable methods already available to your account and estimate time to fund your next gear upgrade.</div><div class="toolbar"><select id="moneySkill"><option>All Skills</option></select><button class="refresh" id="runMoney">Find Methods</button></div></div><div id="moneyStatus" class="muted"></div><div id="moneyList"></div></section>
 <section id="activities" class="section"><div class="card"><b>Minigames & Activities</b><div class="muted" style="margin-top:4px">Account-progression activities filtered using your live skill levels.</div><div class="toolbar"><select id="activityFilter"><option value="next">Worth doing next</option><option value="ready">Ready now</option><option value="all">Show all</option></select><input id="activitySearch" placeholder="Search activities…"></div></div><div id="activityStatus" class="muted"></div><div id="activityList"></div></section>
 <section id="routine" class="section"><div class="card"><b>Daily / Weekly Tracker</b><div class="muted" style="margin-top:4px">Recurring account activities with persistent completion tracking and timers.</div><div class="toolbar"><select id="routineView"><option value="ready">Ready now</option><option value="all">All activities</option><option value="daily">Daily / repeatable</option><option value="weekly">Weekly</option></select><button class="refresh" id="routineReset">Reset completed</button></div></div><div id="routineStatus" class="muted"></div><div id="routineList"></div></section>
 <section id="farming" class="section"><div class="card"><b>Farming & Herb Runs</b><div class="muted" style="margin-top:4px">Build a run from patches and herbs available at your live Farming level.</div><div class="toolbar"><select id="farmView"><option value="herbs">Herb run</option><option value="trees">Tree run</option><option value="patches">Patch unlocks</option></select><select id="farmLocked"><option value="ready">Available now</option><option value="all">Show locked</option></select></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
@@ -96,6 +98,7 @@ document.getElementById('slayerSearch').addEventListener('input',renderSlayerCom
 ['gearStyle','gearAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderGear));
 ['upgradeStyle','upgradeView'].forEach(id=>document.getElementById(id).addEventListener('change',renderUpgrades));
 document.getElementById('saveCash').addEventListener('click',()=>{localStorage.setItem('osrsCash',String(Math.max(0,Number(document.getElementById('cashStack').value)||0)));renderWealth();renderUpgrades()});
+document.getElementById('runMoney').addEventListener('click',runMoneyPlanner);
 document.getElementById('activityFilter').addEventListener('change',renderActivities);
 document.getElementById('activitySearch').addEventListener('input',renderActivities);
 document.getElementById('saveSlayerTask').addEventListener('click',saveSlayerTask);
@@ -149,7 +152,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderSlayerTracker(); renderGear(); renderUpgrades(); renderWealth(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap(); renderRoutine();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderSlayerTracker(); renderGear(); renderUpgrades(); renderWealth(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderRoadmap(); renderRoutine(); populateMoneySkills();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -292,6 +295,22 @@ function renderNextUp(){
   rows=rows.slice(0,25);
   document.getElementById('nextStatus').textContent=rows.length+' recommendations';
   document.getElementById('nextList').innerHTML=rows.map((x,i)=>'<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x.name)+'</b><br><small>'+esc(x.type)+'</small></span><span class="badge">'+(x.score>=90?'Do next':x.score>=50?'Prepare':'Train')+'</span></div><div style="margin-top:8px">'+esc(x.detail)+'</div>'+(x.extra?'<div class="muted" style="margin-top:5px">'+esc(x.extra)+'</div>':'')+'</div>').join('')||'<div class="empty">No recommendations found for this filter.</div>';
+}
+function populateMoneySkills(){
+ const el=document.getElementById('moneySkill');if(!el||el.options.length>1)return;
+ (appData.stats||[]).filter(x=>x.skill&&x.skill!=='Overall').forEach(x=>{const o=document.createElement('option');o.textContent=x.skill;o.value=x.skill;el.appendChild(o)});
+}
+async function runMoneyPlanner(){
+ const skill=document.getElementById('moneySkill').value,status=document.getElementById('moneyStatus'),list=document.getElementById('moneyList');
+ status.textContent='Finding profitable methods…';list.innerHTML='';
+ try{
+  const url=API.replace('?action=mobileData','?action=optimizer')+'&skill='+encodeURIComponent(skill)+'&objective='+encodeURIComponent('Best GP/hr')+'&showLocked=false&targetLevel=99';
+  const j=await fetch(url,{cache:'no-store',redirect:'follow'}).then(r=>r.json()),rows=(j.data||[]).filter(x=>Number(x.gpHr)>0&&String(x.unlocked).toLowerCase()!=='no').sort((a,b)=>Number(b.gpHr)-Number(a.gpHr));
+  const cash=cashAvailable(),gear=GEAR.map(x=>({x,price:gearPrice(x[2]),ready:liveLevel(x[4])>=x[3],owned:!!ownedGear()[x[2]]})).filter(r=>r.ready&&!r.owned&&r.price>cash).sort((a,b)=>(b.x[5]-a.x[5])||(a.price-b.price))[0];
+  const short=gear?Math.max(0,gear.price-cash):0;
+  status.textContent=(gear?fmt(short)+' GP needed for '+gear.x[2]+' • ':'')+rows.length+' profitable methods found';
+  list.innerHTML=rows.slice(0,20).map((m,i)=>{const gp=Number(m.gpHr)||0,h=short&&gp?short/gp:0;return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(m.method)+'</b><br><small>'+esc(m.skill)+' • requirement '+esc(String(m.req||''))+'</small></span><b>'+fmt(gp)+' GP/hr</b></div><div class="badges">'+(short?'<span class="badge good">'+(h<1?Math.ceil(h*60)+' min':h.toFixed(1)+' hr')+' to fund</span>':'')+(m.xpHr?'<span class="badge">'+fmt(m.xpHr)+' XP/hr</span>':'')+'</div>'+(m.notes?'<div class="muted" style="margin-top:8px">'+esc(m.notes)+'</div>':'')+'</div>'}).join('')||'<div class="empty">No profitable unlocked methods were returned by the optimizer.</div>';
+ }catch(e){status.textContent='Could not load money-making methods. Try again.';}
 }
 function populateOptimizerSkills(){
   const el=document.getElementById('optSkill'); if(!el||el.options.length)return;
@@ -571,7 +590,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=28');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=29');
 loadData(false);
 </script>
 </body></html>
