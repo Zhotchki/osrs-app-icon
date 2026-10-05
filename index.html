@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=16">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=16">
+<link rel="manifest" href="./manifest.webmanifest?v=17">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=17">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v16</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v17</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -51,7 +51,7 @@ small{color:var(--muted)}
 <section id="alchemy" class="section"><div class="toolbar"><input id="alchSearch" placeholder="Search items…"><select id="alchSort"><option value="profit">Highest profit</option><option value="name">Item name</option></select></div><div id="alchemyList"></div></section>
 <section id="optimizer" class="section"><div class="card"><b>Training Optimizer</b><div class="muted" style="margin-top:4px">Compare training methods using your current stats and live sheet data.</div><div class="toolbar"><select id="optSkill"></select><select id="optObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Shortest Time</option></select></div><div class="toolbar"><input id="optTarget" type="number" min="2" max="99" value="99" placeholder="Target level"><select id="optLocked"><option value="false">Unlocked only</option><option value="true">Include locked</option></select></div><button class="refresh" id="runOptimizer">Run Optimizer</button></div><div id="optimizerStatus" class="muted"></div><div id="optimizerList"></div></section>
 <section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
-<section id="slayer" class="section"><div class="card"><b>Slayer Planner</b><div class="muted" style="margin-top:4px">Use your current Slayer level to compare unlocked training options already in your training database.</div><div class="toolbar"><select id="slayerObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option></select><button class="refresh" id="runSlayer">Find Methods</button></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
+<section id="slayer" class="section"><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
 <section id="farming" class="section"><div class="card"><b>Farming & Herb Run Planner</b><div class="muted" style="margin-top:4px">Compare Farming methods from your existing training database using your live Farming level.</div><div class="toolbar"><select id="farmObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option></select><button class="refresh" id="runFarming">Find Methods</button></div></div><div id="farmStatus" class="muted"></div><div id="farmList"></div></section>
 <section id="herblore" class="section"><div class="card"><b>Herblore Planner</b><div class="muted" style="margin-top:4px">Compare unlocked Herblore methods using the potion and live GE data already maintained by your spreadsheet.</div><div class="toolbar"><select id="herbObjective"><option>Fastest XP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Best GP/hr</option><option>Shortest Time</option></select><input id="herbTarget" type="number" min="2" max="99" value="99"></div><button class="refresh" id="runHerblore">Compare Potions</button></div><div id="herbStatus" class="muted"></div><div id="herbList"></div></section>
 <div id="errorBox"></div>
@@ -73,7 +73,8 @@ document.getElementById('alchSort').addEventListener('change',renderAlchemy);
 document.getElementById('runOptimizer').addEventListener('click',runOptimizer);
 document.getElementById('goalSkill').addEventListener('change',renderGoal);
 document.getElementById('goalTarget').addEventListener('input',renderGoal);
-document.getElementById('runSlayer').addEventListener('click',()=>runSkillPlanner('Slayer','slayerObjective','slayerStatus','slayerList'));
+['slayerObjective','slayerMaster','slayerAvail'].forEach(id=>document.getElementById(id).addEventListener('change',renderSlayerCompanion));
+document.getElementById('slayerSearch').addEventListener('input',renderSlayerCompanion);
 document.getElementById('runFarming').addEventListener('click',()=>runSkillPlanner('Farming','farmObjective','farmStatus','farmList'));
 document.getElementById('runHerblore').addEventListener('click',runHerblore);
 document.getElementById('skillSearch').addEventListener('input',renderSkills);
@@ -122,7 +123,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -185,6 +186,48 @@ function populateOptimizerSkills(){
   const names=((appData&&appData.stats)||[]).map(x=>x.skill).filter(Boolean);
   el.innerHTML='<option>All Skills</option>'+names.map(x=>'<option>'+esc(x)+'</option>').join('');
 }
+const SLAYER_TASKS=[
+['Abyssal demons',85,'Duradel,Nieve / Steve',5,'gp','Abyssal whip chance; strong profit task.','Slayer Tower / Catacombs','Barrage'],
+['Alchemical Hydra',95,'Konar',5,'gp','Boss task; high-value uniques and strong profit.','Mount Karuulm',''],
+['Araxytes',92,'Duradel,Nieve / Steve',4,'gp','High-level task with valuable drops.','Morytania',''],
+['Dark beasts',90,'Duradel,Nieve / Steve',3,'overall','Relaxed high-level task.','Mourner Tunnels / Iorwerth',''],
+['Smoke devils',93,'Duradel,Nieve / Steve',5,'xp','Excellent multi-target magic task.','Smoke Devil Dungeon','Barrage'],
+['Nechryaels',80,'Duradel,Nieve / Steve,Konar',5,'xp','Excellent barrage task with useful drops.','Catacombs / Slayer Tower','Barrage'],
+['Abyssal Sire',85,'Duradel,Nieve / Steve',3,'gp','Boss alternative while assigned abyssal demons.','Abyssal Nexus',''],
+['Gargoyles',75,'Duradel,Nieve / Steve,Konar',4,'gp','Consistent alchable drops; good profit.','Slayer Tower',''],
+['Kurasks',70,'Duradel,Nieve / Steve,Konar',4,'gp','Good mid-level profit; leaf-bladed weapon required.','Fremennik Slayer Dungeon',''],
+['Skeletal Wyverns',72,'Duradel,Nieve / Steve',4,'gp','Steady ranged profit task.','Asgarnian Ice Dungeon',''],
+['Brutal black dragons',77,'Duradel,Nieve / Steve',4,'gp','Strong ranged profit.','Catacombs',''],
+['Kraken',87,'Duradel,Nieve / Steve',4,'gp','Low-intensity boss task with useful uniques.','Kraken Cove',''],
+['Cerberus',91,'Duradel,Nieve / Steve',4,'gp','Boss alternative for hellhound tasks.','Taverley Dungeon',''],
+['Greater demons',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',3,'overall','Boss alternatives can improve value.','Multiple','Cannon'],
+['Black demons',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',3,'overall','Demonic gorillas are a valuable alternative after requirements.','Multiple','Cannon'],
+['Bloodvelds',50,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',5,'xp','Good multi-combat XP; cannon variants are fast.','Catacombs / Meiyerditch','Cannon'],
+['Dagannoths',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',5,'xp','Very fast cannon task; Dagannoth Kings optional.','Lighthouse / Waterbirth','Cannon'],
+['Dust devils',65,'Duradel,Nieve / Steve,Konar,Chaeldar',5,'xp','Excellent burst/barrage task.','Catacombs / Smoke Dungeon','Barrage'],
+['Jellies',52,'Nieve / Steve,Konar,Chaeldar,Vannaka',4,'xp','Can burst/barrage in Catacombs.','Catacombs / Fremennik','Barrage'],
+['Turoths',55,'Konar,Chaeldar,Vannaka',3,'overall','Leaf-bladed weapon or broad ammo required.','Fremennik Slayer Dungeon',''],
+['Cave horrors',58,'Nieve / Steve,Chaeldar',3,'gp','Black mask chance; witchwood icon required.','Mos Le Harmless Cave',''],
+['Aberrant spectres',60,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',3,'gp','Herb/seed drops; nose protection required.','Slayer Tower / Catacombs',''],
+['Wyrms',62,'Konar',3,'overall','Karuulm task with useful drops.','Mount Karuulm',''],
+['Drakes',84,'Konar',2,'gp','Profit-oriented Karuulm task.','Mount Karuulm',''],
+['Basilisks',40,'Vannaka,Chaeldar',2,'gp','Basilisk Knights can offer high-value unique chance after unlock.','Fremennik Slayer Dungeon',''],
+['Hellhounds',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',2,'overall','Cerberus becomes available at 91 Slayer.','Multiple','Cannon'],
+['Kalphites',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',4,'xp','Fast cannon task.','Kalphite Lair','Cannon'],
+['Suqahs',1,'Duradel,Nieve / Steve',4,'xp','Fast cannon task.','Lunar Isle','Cannon'],
+['Ankou',1,'Vannaka,Konar',3,'overall','Simple task; Catacombs version offers ancient shards/totem pieces.','Stronghold / Catacombs',''],
+['Fire giants',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',2,'overall','Straightforward combat task.','Multiple','']
+];
+function renderSlayerCompanion(){
+  if(!appData)return;
+  const stat=(appData.stats||[]).find(x=>String(x.skill).toLowerCase()==='slayer'), lvl=Number(stat&&stat.level)||1;
+  const mode=document.getElementById('slayerObjective').value, master=document.getElementById('slayerMaster').value, avail=document.getElementById('slayerAvail').value, q=document.getElementById('slayerSearch').value.toLowerCase().trim();
+  let rows=SLAYER_TASKS.filter(x=>(avail==='all'||x[1]<=lvl)&&(master==='All masters'||x[2].includes(master))&&(!q||x[0].toLowerCase().includes(q)||x[5].toLowerCase().includes(q)));
+  const score=x=>mode==='xp'?(x[4]==='xp'?10:0)+x[3]:mode==='gp'?(x[4]==='gp'?10:0)+x[3]:(x[4]==='overall'?5:0)+x[3];
+  rows.sort((a,b)=>score(b)-score(a)||b[1]-a[1]);
+  document.getElementById('slayerStatus').textContent='Slayer '+lvl+' • '+rows.length+' tasks shown';
+  document.getElementById('slayerList').innerHTML=rows.map((x,i)=>'<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[0])+'</b><br><small>Slayer '+x[1]+' • '+esc(x[2])+'</small></span><b>'+('★★★★★'.slice(0,x[3]))+'</b></div><div class="badges"><span class="badge">'+(x[4]==='xp'?'XP':x[4]==='gp'?'Profit':'Balanced')+'</span>'+(x[7]?'<span class="badge">'+esc(x[7])+'</span>':'')+'<span class="badge">'+esc(x[6])+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[5])+'</div></div>').join('')||'<div class="empty">No tasks match these filters.</div>';
+}
 async function runHerblore(){
   const st=document.getElementById('herbStatus'), list=document.getElementById('herbList'), base=API.split('?')[0];
   st.textContent='Calculating potion methods…'; list.innerHTML='';
@@ -229,7 +272,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=16');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=17');
 loadData(false);
 </script>
 </body></html>
