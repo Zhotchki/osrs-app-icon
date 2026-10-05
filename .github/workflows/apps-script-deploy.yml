@@ -24,8 +24,21 @@ jobs:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
         run: |
           test -n "$CLASPRC_JSON"
-          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          python - <<'PY'
+          import json, os
+          raw = os.environ["CLASPRC_JSON"].strip()
+          # Accept either raw JSON or JSON copied with an extra outer quote layer.
+          try:
+              data = json.loads(raw)
+          except json.JSONDecodeError:
+              data = json.loads(raw.strip("'\""))
+          if isinstance(data, str):
+              data = json.loads(data)
+          with open(os.path.expanduser("~/.clasprc.json"), "w") as f:
+              json.dump(data, f, separators=(",", ":"))
+          PY
           chmod 600 "$HOME/.clasprc.json"
+          node -e "JSON.parse(require('fs').readFileSync(process.env.HOME+'/.clasprc.json','utf8')); console.log('clasp credential JSON valid')"
 
       - name: Pull complete live Apps Script project
         run: |
