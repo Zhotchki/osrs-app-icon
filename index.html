@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=18">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=18">
+<link rel="manifest" href="./manifest.webmanifest?v=19">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=19">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v18</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v19</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -270,6 +270,16 @@ const SLAYER_TASKS=[
 ['Ankou',1,'Vannaka,Konar',3,'overall','Simple task; Catacombs version offers ancient shards/totem pieces.','Stronghold / Catacombs',''],
 ['Fire giants',1,'Duradel,Nieve / Steve,Konar,Chaeldar,Vannaka',2,'overall','Straightforward combat task.','Multiple','']
 ];
+function slayerStyle(task){
+  const n=String(task[0]).toLowerCase();
+  if(/dust devil|nechryael|jell/.test(n)) return 'Magic';
+  if(/wyvern|brutal black dragon|hydra/.test(n)) return 'Ranged';
+  return 'Melee';
+}
+function slayerGearHtml(style){
+  return GEAR.filter(x=>x[0]===style&&liveLevel(x[4])>=x[3]).sort((a,b)=>b[5]-a[5]).slice(0,5)
+    .map(x=>'<span class="badge">'+esc(x[1])+': '+esc(x[2])+'</span>').join('');
+}
 function renderSlayerCompanion(){
   if(!appData)return;
   const stat=(appData.stats||[]).find(x=>String(x.skill).toLowerCase()==='slayer'), lvl=Number(stat&&stat.level)||1;
@@ -278,7 +288,7 @@ function renderSlayerCompanion(){
   const score=x=>mode==='xp'?(x[4]==='xp'?10:0)+x[3]:mode==='gp'?(x[4]==='gp'?10:0)+x[3]:(x[4]==='overall'?5:0)+x[3];
   rows.sort((a,b)=>score(b)-score(a)||b[1]-a[1]);
   document.getElementById('slayerStatus').textContent='Slayer '+lvl+' • '+rows.length+' tasks shown';
-  document.getElementById('slayerList').innerHTML=rows.map((x,i)=>'<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[0])+'</b><br><small>Slayer '+x[1]+' • '+esc(x[2])+'</small></span><b>'+('★★★★★'.slice(0,x[3]))+'</b></div><div class="badges"><span class="badge">'+(x[4]==='xp'?'XP':x[4]==='gp'?'Profit':'Balanced')+'</span>'+(x[7]?'<span class="badge">'+esc(x[7])+'</span>':'')+'<span class="badge">'+esc(x[6])+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[5])+'</div></div>').join('')||'<div class="empty">No tasks match these filters.</div>';
+  document.getElementById('slayerList').innerHTML=rows.map((x,i)=>{const style=slayerStyle(x);return '<div class="card"><div class="row"><span><b>#'+(i+1)+' '+esc(x[0])+'</b><br><small>Slayer '+x[1]+' • '+esc(x[2])+'</small></span><b>'+('★★★★★'.slice(0,x[3]))+'</b></div><div class="badges"><span class="badge">'+(x[4]==='xp'?'XP':x[4]==='gp'?'Profit':'Balanced')+'</span>'+(x[7]?'<span class="badge">'+esc(x[7])+'</span>':'')+'<span class="badge">'+esc(x[6])+'</span><span class="badge">'+style+'</span></div><div class="muted" style="margin-top:8px">'+esc(x[5])+'</div><details style="margin-top:10px"><summary><b>Recommended '+style+' loadout</b></summary><div class="badges" style="margin-top:8px">'+slayerGearHtml(style)+'</div><div class="muted" style="margin-top:8px">Recommendations are filtered to gear your current levels can equip.</div></details></div>'}).join('')||'<div class="empty">No tasks match these filters.</div>';
 }
 async function runHerblore(){
   const st=document.getElementById('herbStatus'), list=document.getElementById('herbList'), base=API.split('?')[0];
@@ -324,7 +334,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=18');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=19');
 loadData(false);
 </script>
 </body></html>
