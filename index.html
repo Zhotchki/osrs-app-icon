@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=32">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=32">
+<link rel="manifest" href="./manifest.webmanifest?v=33">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=33">
 <title>OSRS Companion</title>
 <style>
 :root{--bg:#0f130e;--panel:#182016;--panel2:#202a1d;--gold:#d8b557;--text:#f5f1df;--muted:#aab4a2;--line:#364431;--green:#79c982;--red:#e37979}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v32</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v33</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -48,6 +48,7 @@ small{color:var(--muted)}
 <button data-tab="goals">Goals</button>
 <button data-tab="next">Next Up</button>
 <button data-tab="session">Session</button>
+<button data-tab="history">History</button>
 <button data-tab="roadmap">Roadmap</button>
 <button data-tab="routine">Routine</button>
 <button data-tab="farming">Farming</button>
@@ -62,6 +63,7 @@ small{color:var(--muted)}
 <section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
 <section id="next" class="section"><div class="card"><b>What Should I Do Next?</b><div class="muted" style="margin-top:4px">Prioritized from your live levels plus quest and diary readiness.</div><div class="toolbar"><select id="nextFocus"><option value="balanced">Balanced progression</option><option value="quests">Quests</option><option value="diaries">Achievement diaries</option><option value="skills">Skills</option></select></div></div><div id="nextStatus" class="muted"></div><div id="nextList"></div></section>
 <section id="session" class="section"><div class="card"><b>Play Session Planner</b><div class="muted" style="margin-top:4px">Build a short plan from what is ready on your account right now.</div><div class="toolbar"><select id="sessionLength"><option value="30">30 minutes</option><option value="60" selected>1 hour</option><option value="120">2 hours</option><option value="180">3 hours</option></select><select id="sessionFocus"><option value="balanced">Balanced</option><option value="progress">Account progression</option><option value="gp">Make GP</option><option value="xp">Train skills</option></select><button class="refresh" id="buildSession">Build Plan</button></div></div><div id="sessionStatus" class="muted"></div><div id="sessionList"></div><div class="toolbar"><button class="refresh" id="startSession" style="display:none">Start Session</button><button class="refresh" id="clearSession" style="display:none">Clear</button></div><div id="sessionActive"></div></section>
+<section id="history" class="section"><div class="card"><b>Progress History</b><div class="muted" style="margin-top:4px">Completed play sessions and tracked Slayer tasks saved on this device.</div><div class="toolbar"><button class="refresh" id="clearHistory">Clear Session History</button></div></div><div id="historyStatus" class="muted"></div><div id="historyList"></div></section>
 <section id="roadmap" class="section"><div class="card"><b>Account Roadmap</b><div class="muted" style="margin-top:4px">Choose a milestone and get a live-stat progression path.</div><div class="toolbar"><select id="roadmapGoal"><option value="fire">Fire Cape</option><option value="barrows">Barrows Gloves</option><option value="torso">Fighter Torso</option><option value="slayer85">85 Slayer</option><option value="base70">Base 70 Skills</option><option value="quest">Quest Progression</option><option value="diary">Achievement Diaries</option><option value="gearGoal">Next Gear Upgrade</option><option value="customSkill">Custom Skill Goal</option></select><select id="roadmapSkill" style="display:none"></select><input id="roadmapLevel" type="number" min="2" max="99" value="99" style="display:none" placeholder="Target level"></div></div><div id="roadmapStatus" class="muted"></div><div id="roadmapList"></div></section>
 <section id="slayer" class="section"><div class="card"><b>Current Slayer Task</b><div class="toolbar"><input id="slayerCurrent" placeholder="Monster / task"><input id="slayerKills" type="number" min="0" placeholder="Kills remaining"><button class="refresh" id="saveSlayerTask">Save</button></div><div id="slayerCurrentStatus" class="muted"></div><div class="toolbar"><button class="refresh" id="slayerMinus">-1 Kill</button><button class="refresh" id="slayerComplete">Complete Task</button></div></div><div class="card"><b>Recent Task History</b><div id="slayerHistory" class="muted" style="margin-top:8px"></div></div><div class="card"><b>Slayer Companion</b><div class="muted" style="margin-top:4px">Task reference and planner filtered by your live Slayer level.</div><div class="toolbar"><select id="slayerObjective"><option value="overall">Overall efficiency</option><option value="xp">Fast XP</option><option value="gp">Profit</option></select><select id="slayerMaster"><option>All masters</option><option>Duradel</option><option>Konar</option><option>Nieve / Steve</option><option>Chaeldar</option><option>Vannaka</option></select></div><div class="toolbar"><input id="slayerSearch" placeholder="Search tasks…"><select id="slayerAvail"><option value="available">Available to me</option><option value="all">Show all</option></select></div></div><div id="slayerStatus" class="muted"></div><div id="slayerList"></div></section>
 <section id="gear" class="section"><div class="card"><b>Gear Progression</b><div class="muted" style="margin-top:4px">Recommended combat upgrades filtered by your live levels.</div><div class="toolbar"><select id="gearStyle"><option>Melee</option><option>Ranged</option><option>Magic</option></select><select id="gearAvail"><option value="available">Available to me</option><option value="all">Show future upgrades</option></select></div></div><div id="gearStatus" class="muted"></div><div id="gearList"></div></section>
@@ -106,6 +108,7 @@ document.getElementById('runMoney').addEventListener('click',runMoneyPlanner);
 document.getElementById('buildSession').addEventListener('click',buildSessionPlan);
 document.getElementById('startSession').addEventListener('click',startSessionPlan);
 document.getElementById('clearSession').addEventListener('click',clearSessionPlan);
+document.getElementById('clearHistory').addEventListener('click',()=>{localStorage.removeItem('osrsSessionHistory');renderHistory()});
 document.getElementById('activityFilter').addEventListener('change',renderActivities);
 document.getElementById('activitySearch').addEventListener('input',renderActivities);
 document.getElementById('saveSlayerTask').addEventListener('click',saveSlayerTask);
@@ -159,7 +162,7 @@ function render(){
   renderDiaries();
   renderAlchemy();
   populateOptimizerSkills();
-  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderSlayerTracker(); renderGear(); renderUpgrades(); renderWealth(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderActiveSession(); populateRoadmapSkills(); syncRoadmapControls(); renderRoadmap(); renderRoutine(); populateMoneySkills();
+  populateGoalSkills(); renderGoal(); renderSlayerCompanion(); renderSlayerTracker(); renderGear(); renderUpgrades(); renderWealth(); renderActivities(); renderFarmPlanner(); renderNextUp(); renderActiveSession(); renderHistory(); populateRoadmapSkills(); syncRoadmapControls(); renderRoadmap(); renderRoutine(); populateMoneySkills();
 }
 function renderSkills(){
   let stats=[...((appData&&appData.stats)||[])];
@@ -292,12 +295,25 @@ function startSessionPlan(){
 function toggleSessionStep(i){
  const st=sessionState();if(!st)return;st.done=st.done||{};st.done[i]=!st.done[i];localStorage.setItem('osrsActiveSession',JSON.stringify(st));renderActiveSession();
 }
-function clearSessionPlan(){localStorage.removeItem('osrsActiveSession');renderActiveSession()}
+function clearSessionPlan(){
+ const st=sessionState();if(st&&st.plan){const done=Object.values(st.done||{}).filter(Boolean).length;if(done){let h=[];try{h=JSON.parse(localStorage.getItem('osrsSessionHistory')||'[]')}catch(e){}h.unshift({started:st.started,ended:Date.now(),done,total:st.plan.length,plan:st.plan});localStorage.setItem('osrsSessionHistory',JSON.stringify(h.slice(0,25)));}}
+ localStorage.removeItem('osrsActiveSession');renderActiveSession();renderHistory();
+}
 function renderActiveSession(){
  const st=sessionState(),box=document.getElementById('sessionActive'),clear=document.getElementById('clearSession');if(!box)return;
  if(!st||!st.plan){box.innerHTML='';clear.style.display='none';return}
  clear.style.display='';const done=Object.values(st.done||{}).filter(Boolean).length,total=st.plan.length;
  box.innerHTML='<div class="card"><div class="row"><b>Active Session</b><span class="badge good">'+done+'/'+total+' complete</span></div><div class="muted" style="margin-top:6px">Started '+new Date(st.started).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'</div></div>'+st.plan.map((p,i)=>'<div class="card" style="'+(st.done&&st.done[i]?'opacity:.6':'')+'"><div class="row"><span><b>'+(st.done&&st.done[i]?'✓ ':'')+esc(p.name)+'</b><br><small>'+esc(p.type)+' • '+p.mins+' min</small></span><button class="refresh" onclick="toggleSessionStep('+i+')">'+(st.done&&st.done[i]?'Undo':'Done')+'</button></div><div class="muted" style="margin-top:8px">'+esc(p.detail)+'</div></div>').join('');
+}
+function renderHistory(){
+ const box=document.getElementById('historyList'),status=document.getElementById('historyStatus');if(!box)return;
+ let h=[];try{h=JSON.parse(localStorage.getItem('osrsSessionHistory')||'[]')}catch(e){}
+ const sh=slayerHistoryState(),mins=h.reduce((a,x)=>a+(x.plan||[]).reduce((b,p)=>b+(Number(p.mins)||0),0),0),kills=sh.reduce((a,x)=>a+(Number(x.count)||0),0);
+ status.textContent=h.length+' sessions • '+fmt(mins)+' planned minutes • '+sh.length+' Slayer tasks • '+fmt(kills)+' assigned kills tracked';
+ let html='';
+ if(h.length)html+='<div class="card"><b>Recent Sessions</b></div>'+h.map(x=>'<div class="card"><div class="row"><span><b>'+new Date(x.started).toLocaleDateString()+'</b><br><small>'+new Date(x.started).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})+'</small></span><span class="badge '+(x.done===x.total?'good':'')+'">'+x.done+'/'+x.total+' completed</span></div><div class="muted" style="margin-top:8px">'+(x.plan||[]).map(p=>esc(p.name)).join(' • ')+'</div></div>').join('');
+ if(sh.length)html+='<div class="card"><b>Recent Slayer Tasks</b></div>'+sh.slice(0,10).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.name)+'</b></span><span class="badge">'+fmt(x.count||0)+' kills</span></div><div class="muted">'+new Date(x.completed).toLocaleDateString()+'</div></div>').join('');
+ box.innerHTML=html||'<div class="empty">Complete a session or Slayer task to start building history.</div>';
 }
 function populateRoadmapSkills(){
  const el=document.getElementById('roadmapSkill');if(!el||el.options.length)return;
@@ -651,7 +667,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=32');
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=33');
 loadData(false);
 </script>
 </body></html>
