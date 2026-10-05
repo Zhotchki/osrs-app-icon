@@ -468,80 +468,43 @@ function jsonOutput_(payload) {
 function getMobileAppData() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const settings = ss.getSheetByName('Settings');
-  const player = settings ? String(settings.getRange('E4').getValue()).trim() : '';
-
-  const statsRaw = ss.getSheetByName('Character_Stats').getRange(11,1,25,4).getValues();
-  const stats = statsRaw.filter(r=>r[0] && r[0] !== 'Overall').map(r=>({
-    skill:r[0], rank:r[1], level:r[2], xp:r[3]
-  }));
-
-  const fastestRaw = ss.getSheetByName('Fastest_Leveling').getRange(10,1,24,12).getValues();
-  const fastest = fastestRaw.filter(r=>r[0]).map(r=>({
-    skill:r[0], level:r[1], method:r[2], req:r[3], xpHr:r[4], gpHr:r[5], gpXp:r[6],
-    status:r[7], nextMethod:r[8], nextLevel:r[9], nextXpHr:r[10], source:r[11]
-  }));
-
-  const questSheet = ss.getSheetByName('Quest_Tracker');
-  let quests = [];
-  if (questSheet && questSheet.getLastRow() >= 11) {
-    const qRows = Math.min(220, questSheet.getLastRow() - 10);
-    quests = questSheet.getRange(11,1,qRows,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({
-      name:r[0], status:r[1], readiness:r[2], missing:r[3], notes:r[4], prereqs:r[5], wiki:r[6]
-    }));
-  }
-  const diarySheet = ss.getSheetByName('Diary_Tracker');
-  let diaries = [];
-  if (diarySheet && diarySheet.getLastRow() >= 10) {
-    const dRows = Math.min(48, diarySheet.getLastRow() - 9);
-    diaries = diarySheet.getRange(10,1,dRows,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({
-      region:r[0], tier:r[1], status:r[2], readiness:r[3], missing:r[4], notes:r[5], wiki:r[6]
-    }));
-  }
-
-  const alchSheet = ss.getSheetByName('High_Alchemy');
-  let highAlchemy = [];
-  if (alchSheet && alchSheet.getLastRow() >= 2) {
-    const rowCount = Math.min(alchSheet.getLastRow(), 301);
-    const colCount = Math.min(Math.max(alchSheet.getLastColumn(), 1), 12);
-    const vals = alchSheet.getRange(1,1,rowCount,colCount).getDisplayValues();
-    const headers = vals[0].map(x=>String(x||'').trim());
-    const col = name => headers.indexOf(name);
-    const cItem=col('Item'), cBuy=col('Cost Used'), cAlch=col('High Alch Value'),
-      cNature=col('Nature Rune'), cProfit=col('Profit / Alch'), cLimit=col('GE Limit'),
-      cAge=col('Latest Buy Age (min)');
-    highAlchemy = vals.slice(1).filter(r=>cItem>=0 && r[cItem]).slice(0,300).map(r=>({
-      item:r[cItem], buy:cBuy>=0?r[cBuy]:'', highAlch:cAlch>=0?r[cAlch]:'',
-      nature:cNature>=0?r[cNature]:'', profit:cProfit>=0?r[cProfit]:'',
-      limit:cLimit>=0?r[cLimit]:'', age:cAge>=0?r[cAge]:''
-    }));
-  }
-
-  const gearNames = new Set([
-    'Dragon scimitar','Abyssal whip','Abyssal tentacle','Helm of neitiznot','Neitiznot faceguard',
-    'Fighter torso','Bandos chestplate','Bandos tassets','Fire cape','Amulet of glory','Amulet of fury',
-    'Amulet of torture','Barrows gloves','Dragon boots','Magic shortbow (i)','Rune crossbow','Toxic blowpipe',
-    'Archer helm','Masori mask','Masori body','Black d’hide body','Blessed d’hide body','Ava’s accumulator',
-    'Ava’s assembler','Necklace of anguish','Pegasian boots',"Iban's staff",'Trident of the seas',
-    'Trident of the swamp','Mystic robe top',"Ahrim's robetop",'God cape','Imbued god cape','Occult necklace',
-    'Tormented bracelet'
-  ].map(x=>x.toLowerCase()));
-  const priceSheet = ss.getSheetByName('Price_Data');
-  let gearPrices = [];
-  if (priceSheet && priceSheet.getLastRow() > 1) {
-    const priceRows = Math.min(priceSheet.getLastRow()-1, 5000);
-    gearPrices = priceSheet.getRange(2,1,priceRows,7).getValues()
-      .filter(r=>gearNames.has(String(r[0]||'').toLowerCase()))
-      .map(r=>({item:r[0],id:r[1],buy:r[2],sell:r[3],mid:r[6]}));
-  }
-
-  return {
-    player,
-    lastRefresh: settings ? settings.getRange('G14').getDisplayValue() : '',
-    refreshStatus: sanitizeMobileRefreshStatus_(settings ? settings.getRange('G15').getDisplayValue() : ''),
-    stats, fastest, quests, diaries, highAlchemy, gearPrices
+  const safe = (name, fn, fallback) => {
+    try { return fn(); } catch (e) { console.log('mobileData '+name+': '+e.message); return fallback; }
   };
+  const player = safe('player',()=>settings ? String(settings.getRange('E4').getDisplayValue()).trim() : '','');
+  const stats = safe('stats',()=>{
+    const sh=ss.getSheetByName('Character_Stats'); if(!sh)return [];
+    return sh.getRange(11,1,25,4).getDisplayValues().filter(r=>r[0]&&r[0]!=='Overall').map(r=>({skill:r[0],rank:r[1],level:r[2],xp:r[3]}));
+  },[]);
+  const fastest = safe('fastest',()=>{
+    const sh=ss.getSheetByName('Fastest_Leveling'); if(!sh)return [];
+    return sh.getRange(10,1,24,12).getDisplayValues().filter(r=>r[0]).map(r=>({skill:r[0],level:r[1],method:r[2],req:r[3],xpHr:r[4],gpHr:r[5],gpXp:r[6],status:r[7],nextMethod:r[8],nextLevel:r[9],nextXpHr:r[10],source:r[11]}));
+  },[]);
+  const quests = safe('quests',()=>{
+    const sh=ss.getSheetByName('Quest_Tracker'); if(!sh||sh.getLastRow()<11)return [];
+    const n=Math.min(220,sh.getLastRow()-10);
+    return sh.getRange(11,1,n,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({name:r[0],status:r[1],readiness:r[2],missing:r[3],notes:r[4],prereqs:r[5],wiki:r[6]}));
+  },[]);
+  const diaries = safe('diaries',()=>{
+    const sh=ss.getSheetByName('Diary_Tracker'); if(!sh||sh.getLastRow()<10)return [];
+    const n=Math.min(48,sh.getLastRow()-9);
+    return sh.getRange(10,1,n,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({region:r[0],tier:r[1],status:r[2],readiness:r[3],missing:r[4],notes:r[5],wiki:r[6]}));
+  },[]);
+  const highAlchemy = safe('alchemy',()=>{
+    const sh=ss.getSheetByName('High_Alchemy'); if(!sh||sh.getLastRow()<2)return [];
+    const rows=Math.min(sh.getLastRow(),301), cols=Math.min(Math.max(sh.getLastColumn(),1),12), vals=sh.getRange(1,1,rows,cols).getDisplayValues();
+    const h=vals[0].map(x=>String(x||'').trim()), col=n=>h.indexOf(n);
+    const ci=col('Item'),cb=col('Cost Used'),ca=col('High Alch Value'),cn=col('Nature Rune'),cp=col('Profit / Alch'),cl=col('GE Limit'),cg=col('Latest Buy Age (min)');
+    return vals.slice(1).filter(r=>ci>=0&&r[ci]).slice(0,300).map(r=>({item:r[ci],buy:cb>=0?r[cb]:'',highAlch:ca>=0?r[ca]:'',nature:cn>=0?r[cn]:'',profit:cp>=0?r[cp]:'',limit:cl>=0?r[cl]:'',age:cg>=0?r[cg]:''}));
+  },[]);
+  const gearPrices = safe('gearPrices',()=>{
+    const wanted=new Set(['Dragon scimitar','Abyssal whip','Abyssal tentacle','Helm of neitiznot','Neitiznot faceguard','Fighter torso','Bandos chestplate','Bandos tassets','Fire cape','Amulet of glory','Amulet of fury','Amulet of torture','Barrows gloves','Dragon boots','Magic shortbow (i)','Rune crossbow','Toxic blowpipe','Archer helm','Masori mask','Masori body','Black d’hide body','Blessed d’hide body','Ava’s accumulator','Ava’s assembler','Necklace of anguish','Pegasian boots',"Iban's staff",'Trident of the seas','Trident of the swamp','Mystic robe top',"Ahrim's robetop",'God cape','Imbued god cape','Occult necklace','Tormented bracelet'].map(x=>x.toLowerCase()));
+    const sh=ss.getSheetByName('Price_Data'); if(!sh||sh.getLastRow()<2)return [];
+    const n=Math.min(sh.getLastRow()-1,5000);
+    return sh.getRange(2,1,n,7).getDisplayValues().filter(r=>wanted.has(String(r[0]||'').toLowerCase())).map(r=>({item:r[0],id:r[1],buy:r[2],sell:r[3],mid:r[6]}));
+  },[]);
+  return {player,lastRefresh:safe('lastRefresh',()=>settings?settings.getRange('G14').getDisplayValue():'',''),refreshStatus:sanitizeMobileRefreshStatus_(safe('refreshStatus',()=>settings?settings.getRange('G15').getDisplayValue():'','')),stats,fastest,quests,diaries,highAlchemy,gearPrices};
 }
-
 
 function sanitizeMobileRefreshStatus_(status) {
   const text = String(status || '').trim();
