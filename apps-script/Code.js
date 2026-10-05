@@ -482,13 +482,21 @@ function getMobileAppData() {
   }));
 
   const questSheet = ss.getSheetByName('Quest_Tracker');
-  const quests = questSheet.getRange(11,1,220,8).getValues().filter(r=>r[0]).map(r=>({
-    name:r[0], status:r[1], readiness:r[2], missing:r[3], notes:r[4], prereqs:r[5], wiki:r[6]
-  }));
+  let quests = [];
+  if (questSheet && questSheet.getLastRow() >= 11) {
+    const qRows = Math.min(220, questSheet.getLastRow() - 10);
+    quests = questSheet.getRange(11,1,qRows,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({
+      name:r[0], status:r[1], readiness:r[2], missing:r[3], notes:r[4], prereqs:r[5], wiki:r[6]
+    }));
+  }
   const diarySheet = ss.getSheetByName('Diary_Tracker');
-  const diaries = diarySheet.getRange(10,1,48,8).getValues().filter(r=>r[0]).map(r=>({
-    region:r[0], tier:r[1], status:r[2], readiness:r[3], missing:r[4], notes:r[5], wiki:r[6]
-  }));
+  let diaries = [];
+  if (diarySheet && diarySheet.getLastRow() >= 10) {
+    const dRows = Math.min(48, diarySheet.getLastRow() - 9);
+    diaries = diarySheet.getRange(10,1,dRows,8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({
+      region:r[0], tier:r[1], status:r[2], readiness:r[3], missing:r[4], notes:r[5], wiki:r[6]
+    }));
+  }
 
   const alchSheet = ss.getSheetByName('High_Alchemy');
   let highAlchemy = [];
