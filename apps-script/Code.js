@@ -482,9 +482,13 @@ function getMobileAppData() {
   }));
 
   const questSheet = ss.getSheetByName('Quest_Tracker');
-  const quests = questSheet.getRange(11,1,220,2).getValues().filter(r=>r[0]).map(r=>({name:r[0],status:r[1]}));
+  const quests = questSheet.getRange(11,1,220,8).getValues().filter(r=>r[0]).map(r=>({
+    name:r[0], status:r[1], readiness:r[2], missing:r[3], notes:r[4], prereqs:r[5], wiki:r[6]
+  }));
   const diarySheet = ss.getSheetByName('Diary_Tracker');
-  const diaries = diarySheet.getRange(10,1,48,3).getValues().filter(r=>r[0]).map(r=>({region:r[0],tier:r[1],status:r[2]}));
+  const diaries = diarySheet.getRange(10,1,48,8).getValues().filter(r=>r[0]).map(r=>({
+    region:r[0], tier:r[1], status:r[2], readiness:r[3], missing:r[4], notes:r[5], wiki:r[6]
+  }));
 
   return {
     player,
