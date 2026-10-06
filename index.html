@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=40">
+<link rel="manifest" href="./manifest.webmanifest?v=41">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=39">
 <title>OSRS Companion</title>
 <style>
@@ -21,7 +21,7 @@ main{padding:14px 16px calc(90px + env(safe-area-inset-bottom))}.hero,.card{back
 .tabs button.active{background:var(--gold);color:#1a160c}.refresh{width:auto;padding:9px 12px}
 .section{display:none}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
 .skill{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.skill b{display:block;font-size:15px}.lvl{font-size:26px;font-weight:900;color:var(--gold)}
-.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.badge{font-size:11px;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:4px 7px}.badge.ok{background:#172b19}.badge.bad{background:#301b1b}.details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.details summary{cursor:pointer;color:var(--gold);font-weight:800;font-size:12px}.details p{margin:8px 0 0;line-height:1.45}.wiki{display:inline-block;margin-top:8px;color:var(--gold);font-size:12px;font-weight:800;text-decoration:none}.row:last-child{border-bottom:0}.ok{color:var(--green)}.bad{color:var(--red)}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.badge{font-size:11px;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:4px 7px}.badge.ok{background:#172b19}.badge.bad{background:#301b1b}.details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.details summary{cursor:pointer;color:var(--gold);font-weight:800;font-size:12px}.details p{margin:8px 0 0;line-height:1.45}.wiki{display:inline-block;margin-top:8px;color:var(--gold);font-size:12px;font-weight:800;text-decoration:none}.row:last-child{border-bottom:0}.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--gold)}.neutral{color:var(--muted)}.badge.warn{background:#302817}.badge.neutral{background:#20251f}
 .error{border-color:#653939;background:#2a1919}.empty{text-align:center;padding:28px;color:var(--muted)}
 input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#11170f;color:var(--text);margin:8px 0 12px}
 small{color:var(--muted)}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v40</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v41</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -121,7 +121,7 @@ document.getElementById('skillSort').addEventListener('change',renderSkills);
 
 function fmt(n){return Number(n||0).toLocaleString()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function statusClass(s){s=String(s||'').toLowerCase();return /complete|yes|success|profit|unlocked/.test(s)?'ok':(/incomplete|no|locked|error|missing/.test(s)?'bad':'')}
+function statusClass(s){s=String(s||'').trim().toLowerCase();if(/incomplete|not complete|no|locked|error|missing|failed/.test(s))return 'bad';if(/in progress|partial|started|pending/.test(s))return 'warn';if(/unknown|unavailable|not present/.test(s))return 'neutral';if(/complete|yes|success|profit|unlocked|ready/.test(s))return 'ok';return ''}
 
 async function fetchJsonWithTimeout(url,ms=30000){
  const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
@@ -709,7 +709,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=40',{updateViaCache:'none'}).then(r=>r.update());
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=41',{updateViaCache:'none'}).then(r=>r.update());
 loadData(false);
 </script>
 </body></html>
