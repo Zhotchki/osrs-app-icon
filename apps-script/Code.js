@@ -1066,18 +1066,31 @@ function loadCachedWikiSync_() {
   const cache = ss.getSheetByName(WIKISYNC_CACHE_SHEET_);
   if (!cache) return null;
 
-  const player = String(cache.getRange('B2').getValue()).trim();
-  const profile = String(cache.getRange('B3').getValue()).trim();
-  const timestamp = cache.getRange('B4').getValue();
-  const chunkCount = Number(cache.getRange('B8').getValue()) || 0;
-  if (!player || !profile || !chunkCount) return null;
+  let player = String(cache.getRange('B2').getValue()).trim();
+  let profile = String(cache.getRange('B3').getValue()).trim();
+  let timestamp = cache.getRange('B4').getValue();
+  let chunkCount = Number(cache.getRange('B8').getValue()) || 0;
+  let text = '';
+
+  if (player && profile && chunkCount) {
+    text = cache.getRange(11,2,chunkCount,1).getValues().map(r=>String(r[0]||'')).join('');
+  } else {
+    // Recover caches written by the earlier simple A-column layout.
+    const last = cache.getLastRow();
+    if (last >= 2) text = cache.getRange(2,1,last-1,1).getValues().map(r=>String(r[0]||'')).join('');
+    if (text) {
+      try {
+        const legacy = JSON.parse(text);
+        player = String(legacy.player||'').trim();
+        profile = String(legacy.profile||'STANDARD').trim();
+        timestamp = legacy.timestamp || '';
+      } catch(e) { text=''; }
+    }
+  }
+  if (!player || !profile || !text) return null;
 
   const expected = String(ss.getSheetByName('Settings').getRange('E4').getValue()).trim();
   if (expected && player.toLowerCase() !== expected.toLowerCase()) return null;
-
-  const vals = cache.getRange(11,2,chunkCount,1).getValues();
-  const text = vals.map(r=>String(r[0]||'')).join('');
-  if (!text) return null;
 
   try {
     const data = JSON.parse(text);
@@ -1089,16 +1102,7 @@ function loadCachedWikiSync_() {
       diarySource:data.achievement_diaries_source || diaryInfo.path || ''
     };
   } catch (e) {
-    wikiSyncDiagnostics_({
-      connection:'Cache error',
-      profile:profile,
-      source:'Cached browser data',
-      quests:'Unknown',
-      diaries:'Unknown',
-      keys:'',
-      cached:'Corrupt',
-      error:e.message
-    });
+    wikiSyncDiagnostics_({connection:'Cache error',profile,source:'Cached browser data',quests:'Unknown',diaries:'Unknown',keys:'',cached:'Corrupt',error:e.message});
     return null;
   }
 }
