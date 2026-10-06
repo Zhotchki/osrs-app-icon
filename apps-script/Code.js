@@ -440,6 +440,14 @@ function doGet(e) {
   if (action === 'questDiaryData') {
     return jsonOutput_(getMobileQuestDiaryData_());
   }
+  if (action === 'syncDiagnostics') {
+    const ss=SpreadsheetApp.getActiveSpreadsheet(), settings=ss.getSheetByName('Settings'), d=ss.getSheetByName('Diary_Tracker'), q=ss.getSheetByName('Quest_Tracker');
+    return jsonOutput_({
+      connection:settings?settings.getRange('J12:J20').getDisplayValues().map(r=>r[0]):[],
+      diary:d?d.getRange('J2:K4').getDisplayValues():[],
+      questMeta:q?q.getRange('B4:B6').getDisplayValues().map(r=>r[0]):[]
+    });
+  }
 
   if (action === 'optimizer') {
     const p = e.parameter || {};
