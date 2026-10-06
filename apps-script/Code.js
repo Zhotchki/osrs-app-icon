@@ -485,6 +485,25 @@ function getMobileCoreData_() {
 function getMobileQuestDiaryData_() {
   const ss=SpreadsheetApp.getActiveSpreadsheet();
   const q=ss.getSheetByName('Quest_Tracker'), d=ss.getSheetByName('Diary_Tracker');
+
+  // Self-heal the placeholder created when the old cache reader could not see
+  // browser WikiSync data. This is intentionally lightweight: no Wiki page
+  // requests are made during the mobile API call.
+  try {
+    const firstQuest=q ? String(q.getRange('A11').getDisplayValue()).trim() : '';
+    if (!firstQuest || /WikiSync browser sync required|Quest section not present/i.test(firstQuest)) {
+      const sync=loadCachedWikiSync_();
+      if (sync && sync.quests && typeof sync.quests==='object') {
+        refreshQuestsExact_(sync);
+        if (d && sync.diaries && typeof sync.diaries==='object') {
+          const pairs=d.getRange(10,1,Math.min(48,Math.max(0,d.getLastRow()-9)),2).getDisplayValues();
+          if (pairs.length) d.getRange(10,3,pairs.length,1).setValues(pairs.map(r=>[diaryStatus_(sync.diaries,r[0],r[1])]));
+        }
+        SpreadsheetApp.flush();
+      }
+    }
+  } catch(e) { console.log('mobile quest/diary self-heal: '+e.message); }
+
   const quests=q&&q.getLastRow()>=11?q.getRange(11,1,Math.min(220,q.getLastRow()-10),8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({name:r[0],status:r[1],readiness:r[2],missing:r[3],notes:r[4],prereqs:r[5],wiki:r[6]})):[];
   const diaries=d&&d.getLastRow()>=10?d.getRange(10,1,Math.min(48,d.getLastRow()-9),8).getDisplayValues().filter(r=>String(r[0]||'').trim()).map(r=>({region:r[0],tier:r[1],status:r[2],readiness:r[3],missing:r[4],notes:r[5],wiki:r[6]})):[];
   return {quests,diaries};
