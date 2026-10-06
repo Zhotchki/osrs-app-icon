@@ -135,7 +135,7 @@ async function loadData(manual=false){
   for(const url of [...new Set([API,API_FALLBACK])]){try{j=await fetchJsonWithTimeout(url);lastErr=null;break}catch(err){lastErr=err;if(String(err&&err.message||'').includes('HTTP 404')){await new Promise(r=>setTimeout(r,1200));try{j=await fetchJsonWithTimeout(url);lastErr=null;break}catch(err2){lastErr=err2}}}}
   if(lastErr)throw lastErr;if(!j||!j.ok)throw new Error('Backend returned an error');
   appData=j.data||{};
-  try{const qurl=API.replace('action=mobileData','action=questDiaryData');const qj=await fetchJsonWithTimeout(qurl,15000);if(qj&&qj.ok){appData.quests=qj.data.quests||[];appData.diaries=qj.data.diaries||[]}}catch(qe){console.log('Quest/diary load:',qe)}
+  try{const qurl=API.replace('action=mobileData','action=questDiaryData');const qj=await fetchJsonWithTimeout(qurl,15000);if(qj&&qj.ok){appData.quests=qj.data.quests||[];appData.diaries=qj.data.diaries||[];try{const dj=await fetchJsonWithTimeout(API.replace('action=mobileData','action=syncDiagnostics'),10000);if(dj&&dj.ok){localStorage.setItem('osrsSyncDiagnostics',JSON.stringify(dj.data||{}));console.log('OSRS sync diagnostics',dj.data)}}catch(de){console.log('Sync diagnostics unavailable',de)}}}catch(qe){console.log('Quest/diary load:',qe)}
   try{localStorage.setItem('osrsLastGoodData',JSON.stringify({saved:Date.now(),data:appData}))}catch(e){}render();st.textContent='Connected • '+(appData.refreshStatus||'Live data loaded');
  }catch(e){
   const timed=e&&e.name==='AbortError';let cached=null;try{cached=JSON.parse(localStorage.getItem('osrsLastGoodData')||'null')}catch(x){}
