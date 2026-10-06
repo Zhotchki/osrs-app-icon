@@ -1021,14 +1021,17 @@ function saveWikiSyncBrowserPayload(player, profile, rawPayload, questRequiremen
     achievement_diaries_source:diaryPath || ''
   });
 
-  try { refreshDiaries_({
-    profile:String(profile||'STANDARD'),
-    timestamp:Date.now(),
-    data:normalized,
-    quests:quests || {},
-    achievement_diaries:diaries || null,
-    achievement_diaries_source:diaryPath || ''
-  }); } catch(e) {}
+  try {
+    refreshDiaries_(
+      String(player||''),
+      getSkillLevels_(),
+      Object.assign({}, normalized, {
+        achievement_diaries:diaries || null,
+        achievement_diaries_source:diaryPath || ''
+      }),
+      'Browser WikiSync: ' + String(profile||'STANDARD')
+    );
+  } catch(e) { console.log('Diary refresh after browser sync: '+e.message); }
 
   return {
     profile:String(profile||'STANDARD'),
@@ -1122,7 +1125,10 @@ function refreshProgressTracker() {
 
   if (sync) {
     refreshQuestsExact_(sync);
-    refreshDiaries_(player, levels, sync.data, 'Cached browser WikiSync: ' + sync.profile);
+    refreshDiaries_(player, levels, Object.assign({}, sync.data || {}, {
+      achievement_diaries:sync.diaries || null,
+      achievement_diaries_source:sync.diarySource || ''
+    }), 'Cached browser WikiSync: ' + sync.profile);
     wikiSyncDiagnostics_({
       connection:'Cached',
       profile:sync.profile,
