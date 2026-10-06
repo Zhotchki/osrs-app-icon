@@ -2095,3 +2095,5 @@ function refreshGEPrices() {
   priceSheet.getRange(1,1,1,7).setFontWeight('bold').setBackground('#17365D').setFontColor('#FFFFFF');
   settings.getRange('B14').setValue(new Date()).setNumberFormat('yyyy-mm-dd hh:mm:ss');
 }
+
+// Clean deployment trigger after GitHub Actions recovery.
