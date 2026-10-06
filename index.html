@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=42">
+<link rel="manifest" href="./manifest.webmanifest?v=43">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=39">
 <title>OSRS Companion</title>
 <style>
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v42</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v43</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -56,8 +56,8 @@ small{color:var(--muted)}
 </div>
 <section id="skills" class="section active"><div class="toolbar"><input id="skillSearch" placeholder="Search skills…"><select id="skillSort"><option value="default">Default order</option><option value="levelDesc">Highest level</option><option value="levelAsc">Lowest level</option></select></div><div id="skillsGrid" class="grid"></div></section>
 <section id="training" class="section"><div id="trainingList"></div></section>
-<section id="quests" class="section"><div class="toolbar"><input id="questSearch" placeholder="Search quests…"><select id="questFilter"><option value="all">All quests</option><option value="ready">Ready</option><option value="missing">Missing requirements</option><option value="incomplete">Incomplete</option></select></div><div id="questList"></div></section>
-<section id="diaries" class="section"><div class="toolbar"><select id="diaryFilter"><option value="all">All diaries</option><option value="ready">Ready</option><option value="missing">Missing requirements</option><option value="incomplete">Incomplete</option></select></div><div id="diaryList"></div></section>
+<section id="quests" class="section"><div class="toolbar"><input id="questSearch" placeholder="Search quests…"><select id="questFilter"><option value="all">All quests</option><option value="complete">Complete</option><option value="incomplete">Incomplete</option><option value="ready">Ready</option><option value="missing">Missing requirements</option></select></div><div id="questList"></div></section>
+<section id="diaries" class="section"><div class="toolbar"><select id="diaryFilter"><option value="all">All diaries</option><option value="complete">Complete</option><option value="incomplete">Incomplete</option><option value="ready">Ready</option><option value="missing">Missing requirements</option></select></div><div id="diaryList"></div></section>
 <section id="alchemy" class="section"><div class="toolbar"><input id="alchSearch" placeholder="Search items…"><select id="alchSort"><option value="profit">Highest profit</option><option value="name">Item name</option></select></div><div id="alchemyList"></div></section>
 <section id="optimizer" class="section"><div class="card"><b>Training Optimizer</b><div class="muted" style="margin-top:4px">Compare training methods using your current stats and live sheet data.</div><div class="toolbar"><select id="optSkill"></select><select id="optObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Shortest Time</option></select></div><div class="toolbar"><input id="optTarget" type="number" min="2" max="99" value="99" placeholder="Target level"><select id="optLocked"><option value="false">Unlocked only</option><option value="true">Include locked</option></select></div><button class="refresh" id="runOptimizer">Run Optimizer</button></div><div id="optimizerStatus" class="muted"></div><div id="optimizerList"></div></section>
 <section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
@@ -173,9 +173,11 @@ function renderSkills(){
   }).join(''):'<div class="empty">No matching skills.</div>';
 }
 function matchProgressFilter(x,filter){
+  const status=String(x.status||'').trim().toLowerCase();
+  if(filter==='complete') return status==='complete';
+  if(filter==='incomplete') return status==='incomplete';
   if(filter==='ready') return /ready/i.test(String(x.readiness||''));
   if(filter==='missing') return /missing/i.test(String(x.readiness||''))||String(x.missing||'').trim();
-  if(filter==='incomplete') return !/complete/i.test(String(x.status||''))||/incomplete/i.test(String(x.status||''));
   return true;
 }
 function formatRequirementNotes(notes){
@@ -722,7 +724,7 @@ function renderAlchemy(){
   else rows.sort((a,b)=>num(b.profit)-num(a.profit));
   document.getElementById('alchemyList').innerHTML=rows.length?rows.slice(0,100).map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.item)+'</b><br><small>Buy '+esc(x.buy||'—')+' • Alch '+esc(x.highAlch||'—')+'</small></span><b class="'+(num(x.profit)>=0?'ok':'bad')+'">'+esc(x.profit||'0')+' gp</b></div><div class="badges"><span class="badge">GE limit '+esc(x.limit||'—')+'</span><span class="badge">Price age '+esc(x.age||'—')+'m</span></div></div>').join(''):'<div class="empty">No High Alchemy data.</div>';
 }
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=42',{updateViaCache:'none'}).then(r=>r.update());
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=43',{updateViaCache:'none'}).then(r=>r.update());
 loadData(false);
 </script>
 </body></html>
