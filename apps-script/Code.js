@@ -996,12 +996,22 @@ function saveWikiSyncBrowserPayload(player, profile, rawPayload, questRequiremen
     achievement_diaries_source:diaryPath || ''
   });
 
-  clearColumnsContent_(cacheSheet,1,Math.max(cacheSheet.getLastRow(),2),1,2);
-  cacheSheet.getRange('A1:B1').setValues([['WikiSync Cache','Value']]);
+  clearColumnsContent_(cacheSheet,1,Math.max(cacheSheet.getLastRow(),12),1,2);
+  cacheSheet.getRange('A1:B8').setValues([
+    ['WikiSync Cache','Value'],
+    ['Player',String(player||'')],
+    ['Profile',String(profile||'STANDARD')],
+    ['Timestamp',new Date()],
+    ['Source','Browser WikiSync'],
+    ['Quest count',quests ? Object.keys(quests).length : 0],
+    ['Diaries',diaries ? 'Present' : 'Missing'],
+    ['Chunk count',0]
+  ]);
   const chunks=[];
   for(let i=0;i<json.length;i+=40000) chunks.push([json.slice(i,i+40000)]);
-  if(chunks.length) cacheSheet.getRange(2,1,chunks.length,1).setValues(chunks);
-  cacheSheet.getRange('B1').setValue(new Date()).setNumberFormat('yyyy-mm-dd hh:mm:ss');
+  cacheSheet.getRange('B8').setValue(chunks.length);
+  if(chunks.length) cacheSheet.getRange(11,2,chunks.length,1).setValues(chunks);
+  cacheSheet.getRange('B4').setNumberFormat('yyyy-mm-dd hh:mm:ss');
   try { cacheSheet.hideSheet(); } catch(e) {}
 
   saveQuestRequirementsFromBridge_(questRequirements || {});
