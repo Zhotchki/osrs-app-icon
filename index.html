@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="OSRS Companion">
-<link rel="manifest" href="./manifest.webmanifest?v=43">
+<link rel="manifest" href="./manifest.webmanifest?v=44">
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=39">
 <title>OSRS Companion</title>
 <style>
@@ -21,7 +21,7 @@ main{padding:14px 16px calc(90px + env(safe-area-inset-bottom))}.hero,.card{back
 .tabs button.active{background:var(--gold);color:#1a160c}.refresh{width:auto;padding:9px 12px}
 .section{display:none}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}
 .skill{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.skill b{display:block;font-size:15px}.lvl{font-size:26px;font-weight:900;color:var(--gold)}
-.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.badge{font-size:11px;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:4px 7px}.badge.ok{background:#172b19}.badge.bad{background:#301b1b}.details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.details summary{cursor:pointer;color:var(--gold);font-weight:800;font-size:12px}.details p{margin:8px 0 0;line-height:1.45}.req-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}.req-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.75fr);gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}.req-item:last-child{border-bottom:0}.req-task{display:flex;gap:8px;line-height:1.4}.req-dot{color:var(--gold);font-weight:900}.reqs{font-size:12px;line-height:1.4;color:var(--muted);background:#11170f;border:1px solid var(--line);border-radius:9px;padding:7px 9px}.reqs b{color:var(--text)}@media(max-width:700px){.req-item{grid-template-columns:1fr;gap:6px}}.wiki{display:inline-block;margin-top:8px;color:var(--gold);font-size:12px;font-weight:800;text-decoration:none}.row:last-child{border-bottom:0}.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--gold)}.neutral{color:var(--muted)}.badge.warn{background:#302817}.badge.neutral{background:#20251f}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.badge{font-size:11px;font-weight:800;border:1px solid var(--line);border-radius:999px;padding:4px 7px}.badge.ok{background:#172b19}.badge.bad{background:#301b1b}.details{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}.details summary{cursor:pointer;color:var(--gold);font-weight:800;font-size:12px}.details p{margin:8px 0 0;line-height:1.45}.req-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}.req-item{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,.75fr);gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}.req-item:last-child{border-bottom:0}.req-item.task-done .req-task-label{text-decoration:line-through;opacity:.55}.req-item.task-done .reqs{opacity:.5}.req-item.task-hidden{display:none}.req-task-check{width:18px;height:18px;min-width:18px;accent-color:var(--green);margin:2px 0 0;cursor:pointer}.req-task-check:disabled{cursor:default}.diary-task-filter{display:flex;gap:9px;align-items:center;color:var(--muted);font-size:13px;margin:8px 0 12px}.diary-task-filter input{width:17px;height:17px;flex:none;margin:0;accent-color:var(--gold)}.diary-task-help{font-size:12px;color:var(--muted);margin-top:8px}.diary-task-count{color:var(--muted);font-size:12px;margin:6px 0}.req-task{display:flex;gap:8px;line-height:1.4}.req-dot{color:var(--gold);font-weight:900}.reqs{font-size:12px;line-height:1.4;color:var(--muted);background:#11170f;border:1px solid var(--line);border-radius:9px;padding:7px 9px}.reqs b{color:var(--text)}@media(max-width:700px){.req-item{grid-template-columns:1fr;gap:6px}}.wiki{display:inline-block;margin-top:8px;color:var(--gold);font-size:12px;font-weight:800;text-decoration:none}.row:last-child{border-bottom:0}.ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--gold)}.neutral{color:var(--muted)}.badge.warn{background:#302817}.badge.neutral{background:#20251f}
 .error{border-color:#653939;background:#2a1919}.empty{text-align:center;padding:28px;color:var(--muted)}
 input{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#11170f;color:var(--text);margin:8px 0 12px}
 small{color:var(--muted)}
@@ -30,7 +30,7 @@ small{color:var(--muted)}
 <body>
 <header><div class="wrap top"><div><div class="brand">OSRS Companion</div><div class="sub" id="statusText">Connecting…</div></div><button class="refresh" onclick="loadData(true)">Refresh</button></div></header>
 <main class="wrap">
-<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v43</span></div></div>
+<div class="hero"><h1 id="playerName">OSRS Player</h1><div class="muted">Last refresh: <span id="lastRefresh">—</span></div><div style="margin-top:8px"><span class="pill">PWA v44</span></div></div>
 <div class="summary"><div class="metric"><b id="totalLevel">—</b><small>Total level</small></div><div class="metric"><b id="questCount">—</b><small>Quests complete</small></div><div class="metric"><b id="diaryCount">—</b><small>Diaries complete</small></div></div>
 <div class="tabs">
 <button class="active" data-tab="skills">Skills</button>
@@ -57,7 +57,7 @@ small{color:var(--muted)}
 <section id="skills" class="section active"><div class="toolbar"><input id="skillSearch" placeholder="Search skills…"><select id="skillSort"><option value="default">Default order</option><option value="levelDesc">Highest level</option><option value="levelAsc">Lowest level</option></select></div><div id="skillsGrid" class="grid"></div></section>
 <section id="training" class="section"><div id="trainingList"></div></section>
 <section id="quests" class="section"><div class="toolbar"><input id="questSearch" placeholder="Search quests…"><select id="questFilter"><option value="all">All quests</option><option value="complete">Complete</option><option value="incomplete">Incomplete</option><option value="ready">Ready</option><option value="missing">Missing requirements</option></select></div><div id="questList"></div></section>
-<section id="diaries" class="section"><div class="toolbar"><select id="diaryFilter"><option value="all">All diaries</option><option value="complete">Complete</option><option value="incomplete">Incomplete</option><option value="ready">Ready</option><option value="missing">Missing requirements</option></select></div><div id="diaryList"></div></section>
+<section id="diaries" class="section"><div class="toolbar"><select id="diaryFilter"><option value="all">All diaries</option><option value="complete">Complete</option><option value="incomplete">Incomplete</option><option value="ready">Ready</option><option value="missing">Missing requirements</option></select></div><label class="diary-task-filter"><input id="diaryHideDone" type="checkbox"> Hide completed diary tasks</label><div id="diaryList"></div></section>
 <section id="alchemy" class="section"><div class="toolbar"><input id="alchSearch" placeholder="Search items…"><select id="alchSort"><option value="profit">Highest profit</option><option value="name">Item name</option></select></div><div id="alchemyList"></div></section>
 <section id="optimizer" class="section"><div class="card"><b>Training Optimizer</b><div class="muted" style="margin-top:4px">Compare training methods using your current stats and live sheet data.</div><div class="toolbar"><select id="optSkill"></select><select id="optObjective"><option>Fastest XP/hr</option><option>Best GP/hr</option><option>Lowest GP/XP</option><option>Lowest Total Cost</option><option>Shortest Time</option></select></div><div class="toolbar"><input id="optTarget" type="number" min="2" max="99" value="99" placeholder="Target level"><select id="optLocked"><option value="false">Unlocked only</option><option value="true">Include locked</option></select></div><button class="refresh" id="runOptimizer">Run Optimizer</button></div><div id="optimizerStatus" class="muted"></div><div id="optimizerList"></div></section>
 <section id="goals" class="section"><div class="card"><b>Level Goal Calculator</b><div class="muted" style="margin-top:4px">Choose a skill and target level to see the remaining XP and your fastest current training estimate.</div><div class="toolbar"><select id="goalSkill"></select><input id="goalTarget" type="number" min="2" max="99" value="99"></div></div><div id="goalResult"></div></section>
@@ -80,6 +80,7 @@ small{color:var(--muted)}
 const API="https://script.google.com/macros/s/AKfycbyqhgxawvjA4bu5jk8fPojBIXie5oeO9NAl76dVmVkpGNscozI7eYadnSQVw5JCOkhjbw/exec?action=mobileData";
 const API_FALLBACK="https://script.google.com/macros/s/AKfycbyqhgxawvjA4bu5jk8fPojBIXie5oeO9NAl76dVmVkpGNscozI7eYadnSQVw5JCOkhjbw/exec?action=mobileData";
 let appData=null;
+try{document.getElementById('diaryHideDone').checked=localStorage.getItem('osrsDiaryHideDone')==='1'}catch(e){}
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
@@ -88,6 +89,14 @@ document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',
 document.getElementById('questSearch').addEventListener('input',renderQuests);
 document.getElementById('questFilter').addEventListener('change',renderQuests);
 document.getElementById('diaryFilter').addEventListener('change',renderDiaries);
+document.getElementById('diaryHideDone').addEventListener('change',e=>{try{localStorage.setItem('osrsDiaryHideDone',e.target.checked?'1':'0')}catch(err){};applyDiaryTaskVisibility()});
+document.getElementById('diaryList').addEventListener('change',e=>{
+  const el=e.target;if(!el.matches('.req-task-check')||el.disabled)return;
+  const checks=getDiaryTaskChecks();checks[el.dataset.key]=el.checked;
+  try{localStorage.setItem('osrsDiaryTaskChecks_v1',JSON.stringify(checks))}catch(err){}
+  const item=el.closest('.req-item');if(item)item.classList.toggle('task-done',el.checked);
+  applyDiaryTaskVisibility();
+});
 document.getElementById('alchSearch').addEventListener('input',renderAlchemy);
 document.getElementById('alchSort').addEventListener('change',renderAlchemy);
 document.getElementById('runOptimizer').addEventListener('click',runOptimizer);
@@ -180,24 +189,48 @@ function matchProgressFilter(x,filter){
   if(filter==='missing') return /missing/i.test(String(x.readiness||''))||String(x.missing||'').trim();
   return true;
 }
-function formatRequirementNotes(notes){
+function getDiaryTaskChecks(){
+  try{return JSON.parse(localStorage.getItem('osrsDiaryTaskChecks_v1')||'{}')||{}}catch(e){return {}}
+}
+function diaryTaskKey(x,task,index){
+  const src=[String(appData&&appData.player||''),String(x.region||''),String(x.tier||''),String(index),String(task||'')].join('|').toLowerCase();
+  let hash=2166136261;for(let i=0;i<src.length;i++){hash^=src.charCodeAt(i);hash=Math.imul(hash,16777619)}
+  return (hash>>>0).toString(36);
+}
+function formatRequirementNotes(notes,diary){
   const raw=String(notes||'').trim();
   if(!raw)return '';
   const tasks=raw.split(/(?=\b\d+\.\s)/).map(x=>x.trim()).filter(Boolean);
   if(tasks.length<2 || !tasks.some(x=>/[—–-]\s*Req\s*:/i.test(x)))return '<p>'+esc(raw)+'</p>';
-  return '<ul class="req-list">'+tasks.map(t=>{
+  const checks=diary?getDiaryTaskChecks():{};
+  const tierDone=!!diary&&String(diary.status||'').trim().toLowerCase()==='complete';
+  let doneCount=0;
+  const rows=tasks.map((t,i)=>{
     t=t.replace(/^\d+\.\s*/,'').trim();
     const m=t.match(/^(.*?)[—–-]\s*Req\s*:\s*(.*)$/is);
     const task=(m?m[1]:t).trim();
-    let req=(m?m[2]:'').trim().replace(/^\*+\s*/,'').replace(/\s*\*+\s*/g,' • ');
-    return '<li class="req-item"><div class="req-task"><span class="req-dot">•</span><span>'+esc(task)+'</span></div>'+(req?'<div class="reqs"><b>Req:</b> '+esc(req)+'</div>':'')+'</li>';
-  }).join('')+'</ul>';
+    const req=(m?m[2]:'').trim().replace(/^\*+\s*/,'').replace(/\s*\*+\s*/g,' • ');
+    const key=diary?diaryTaskKey(diary,task,i):'';
+    const done=tierDone||!!checks[key];
+    if(done)doneCount++;
+    return '<li class="req-item'+(done?' task-done':'')+'"'+(diary?' data-diary-task="1"':'')+'><div class="req-task">'+(diary?'<input type="checkbox" class="req-task-check" aria-label="Mark diary task complete" data-key="'+esc(key)+'"'+(done?' checked':'')+(tierDone?' disabled':'')+'>':'<span class="req-dot">•</span>')+'<span class="req-task-label">'+esc(task)+'</span></div>'+(req?'<div class="reqs"><b>Req:</b> '+esc(req)+'</div>':'')+'</li>';
+  }).join('');
+  return (diary?'<div class="diary-task-count">'+doneCount+' of '+tasks.length+' tasks marked complete</div>':'')+'<ul class="req-list">'+rows+'</ul>'+(diary&&!tierDone?'<div class="diary-task-help">Tick finished tasks to cross them out. Individual checks are saved on this device.</div>':'');
 }
-function detailBlock(x){
+function applyDiaryTaskVisibility(){
+  const hide=document.getElementById('diaryHideDone').checked;
+  document.querySelectorAll('#diaryList .req-item[data-diary-task]').forEach(el=>el.classList.toggle('task-hidden',hide&&el.classList.contains('task-done')));
+  document.querySelectorAll('#diaryList .details').forEach(details=>{
+    const checks=[...details.querySelectorAll('.req-task-check')];
+    const counter=details.querySelector('.diary-task-count');
+    if(counter&&checks.length)counter.textContent=checks.filter(x=>x.checked).length+' of '+checks.length+' tasks marked complete';
+  });
+}
+function detailBlock(x,diary=false){
   const parts=[];
   if(x.missing) parts.push('<p><b>Missing:</b> '+esc(x.missing)+'</p>');
   if(x.prereqs) parts.push('<p><b>Prerequisites:</b> '+esc(x.prereqs)+'</p>');
-  if(x.notes) parts.push(formatRequirementNotes(x.notes));
+  if(x.notes) parts.push(formatRequirementNotes(x.notes,diary?x:null));
   if(x.wiki) parts.push('<a class="wiki" href="'+esc(x.wiki)+'" target="_blank" rel="noopener">Open OSRS Wiki ↗</a>');
   return parts.length?'<details class="details"><summary>Requirements & details</summary>'+parts.join('')+'</details>':'';
 }
@@ -210,7 +243,7 @@ function renderQuests(){
 function renderDiaries(){
   let d=[...((appData&&appData.diaries)||[])]; const filter=document.getElementById('diaryFilter').value;
   d=d.filter(x=>matchProgressFilter(x,filter));
-  document.getElementById('diaryList').innerHTML=d.length?d.map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.region)+'</b><br><small>'+esc(x.tier)+'</small></span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div><div class="badges"><span class="badge '+statusClass(x.readiness)+'">'+esc(x.readiness||'Readiness unknown')+'</span></div>'+detailBlock(x)+'</div>').join(''):'<div class="empty">No matching diaries.</div>';
+  document.getElementById('diaryList').innerHTML=d.length?d.map(x=>'<div class="card"><div class="row"><span><b>'+esc(x.region)+'</b><br><small>'+esc(x.tier)+'</small></span><b class="'+statusClass(x.status)+'">'+esc(x.status||'Unknown')+'</b></div><div class="badges"><span class="badge '+statusClass(x.readiness)+'">'+esc(x.readiness||'Readiness unknown')+'</span></div>'+detailBlock(x,true)+'</div>').join(''):'<div class="empty">No matching diaries.</div>';applyDiaryTaskVisibility();
 }
 function xpForLevel(level){
   level=Math.max(1,Math.min(99,Number(level)||1)); let points=0;
